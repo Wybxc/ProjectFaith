@@ -7,8 +7,6 @@ use tower_http::{
     services::{ServeDir, ServeFile},
 };
 
-use crate::events::Message;
-
 mod events;
 
 /// The Project Faith server.
@@ -34,21 +32,9 @@ async fn main() -> Result<()> {
 
     let (socket_layer, io) = SocketIo::new_layer();
 
-    tracing::info!("Listening on {}:{}", args.listen, args.port);
-
     io.ns("/", |s: SocketRef| {
-        tracing::info!("Connected to namespace /");
-
-        s.on("message", |s: SocketRef| {
-            tracing::info!("Received message event");
-            s.emit(
-                "message-back",
-                &Message {
-                    message: "Hello World!".to_string(),
-                },
-            )
-            .ok();
-        });
+        s.on("createRoom", events::on_create_room);
+        s.on("joinRoom", events::on_join_room);
     });
 
     let cors = CorsLayer::permissive();
@@ -59,6 +45,7 @@ async fn main() -> Result<()> {
         )
         .layer(ServiceBuilder::new().layer(cors).layer(socket_layer));
 
+    tracing::info!("Listening on {}:{}", args.listen, args.port);
     let listener = tokio::net::TcpListener::bind((args.listen, args.port)).await?;
     axum::serve(listener, app).await?;
 

@@ -6,6 +6,9 @@
     "noEmit": true,
     "skipLibCheck": true,
     "useDefineForClassFields": true,
+    "paths": {
+      "@static/*": ["./static/*"]
+    },
     /* modules */
     "module": "ESNext",
     "isolatedModules": true,
