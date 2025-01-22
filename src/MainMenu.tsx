@@ -19,7 +19,7 @@ export default function MainMenu() {
 
   const handleCreateRoom = () => {
     if (username) {
-      socket.emit("createRoom", undefined, (response) => {
+      socket.emit("createRoom", { username }, (response) => {
         navigate(`/${response.room}`);
       });
     }

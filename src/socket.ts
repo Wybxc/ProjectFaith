@@ -1,7 +1,11 @@
 import { useEffect } from "react";
 import { io, type Socket } from "socket.io-client";
-import type { CreateRoomResponse } from "../server/bindings/CreateRoomResponse";
-import type { JoinRoom } from "../server/bindings/JoinRoom";
+import type {
+  CreateRoom,
+  CreateRoomResponse,
+  JoinRoom,
+  JoinRoomResponse,
+} from "../server/bindings/types";
 
 type Event<Request, Response> = (
   request: Request,
@@ -13,8 +17,8 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
-  createRoom: Event<void, CreateRoomResponse>;
-  joinRoom: Event<JoinRoom, void>;
+  createRoom: Event<CreateRoom, CreateRoomResponse>;
+  joinRoom: Event<JoinRoom, JoinRoomResponse>;
 }
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(

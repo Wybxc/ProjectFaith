@@ -1,13 +1,18 @@
+use std::sync::{Arc, Mutex};
+
 use argh::FromArgs;
 use eyre::Result;
-use socketioxide::{extract::SocketRef, SocketIo};
+use socketioxide::{extract::SocketRef, SocketIoBuilder};
 use tower::ServiceBuilder;
 use tower_http::{
     cors::CorsLayer,
     services::{ServeDir, ServeFile},
 };
 
+use crate::game::{GlobalState, PendingGame};
+
 mod events;
+mod game;
 
 /// The Project Faith server.
 #[derive(FromArgs)]
@@ -30,7 +35,9 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
     let args: Args = argh::from_env();
 
-    let (socket_layer, io) = SocketIo::new_layer();
+    let (socket_layer, io) = SocketIoBuilder::new()
+        .with_state(GlobalState::new())
+        .build_layer();
 
     io.ns("/", |s: SocketRef| {
         s.on("createRoom", events::on_create_room);

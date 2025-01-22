@@ -6,7 +6,7 @@
     "dev": "rsbuild dev --open",
     "build": "rsbuild build",
     "preview": "rsbuild preview",
-    "generate-types": "cargo test --manifest-path ./server/Cargo.toml export_bindings",
+    "generate-types": "typeshare ./server --lang=typescript --output-file=./server/bindings/types.ts",
     "format": "biome format --fix && cargo fmt --manifest-path ./server/Cargo.toml",
     "lint": "biome lint && cargo clippy --manifest-path ./server/Cargo.toml",
     "check:format": "biome format && cargo fmt --manifest-path ./server/Cargo.toml -- --check",
