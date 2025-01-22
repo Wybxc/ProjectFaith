@@ -42,6 +42,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.0
         version: 19.0.3(@types/react@19.0.7)
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.17
@@ -810,6 +813,11 @@ packages:
 
   html-entities@2.5.2:
     resolution: {integrity: sha512-K//PSRMQk4FZ78Kyau+mZurHn3FH0Vwr+H36eE0rPbeYkRRi9YxceYPhuN60UwWorxyKHhqoAJl2OFKa4BVtaA==}
+
+  husky@9.1.7:
+    resolution: {integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
@@ -2016,6 +2024,8 @@ snapshots:
       function-bind: 1.1.2
 
   html-entities@2.5.2: {}
+
+  husky@9.1.7: {}
 
   iconv-lite@0.4.24:
     dependencies:

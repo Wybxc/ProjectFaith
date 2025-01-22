@@ -3,10 +3,10 @@ import { pluginReact } from "@rsbuild/plugin-react";
 import TypiaPlugin from "@ryoppippi/unplugin-typia/rspack";
 
 export default defineConfig({
-	plugins: [pluginReact()],
-	tools: {
-		rspack: {
-			plugins: [TypiaPlugin()],
-		},
-	},
+  plugins: [pluginReact()],
+  tools: {
+    rspack: {
+      plugins: [TypiaPlugin()],
+    },
+  },
 });
