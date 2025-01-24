@@ -1,17 +1,23 @@
+import { cn } from "@/lib/utils";
+
 interface TabButtonProps {
   active: boolean;
   label: string;
   onClick: () => void;
+  className?: string; // 添加 className 属性
 }
 
-export function TabButton({ active, label, onClick }: TabButtonProps) {
+export function TabButton({
+  active,
+  label,
+  onClick,
+  className,
+}: TabButtonProps) {
   return (
     <button
       type="button"
+      className={cn("tab", active && "tab-active", className)}
       onClick={onClick}
-      className={`tab flex-1 transition-all duration-200 ${
-        active ? "tab-active bg-primary text-white shadow-md" : "text-white"
-      }`}
     >
       {label}
     </button>

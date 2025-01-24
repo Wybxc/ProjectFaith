@@ -52,21 +52,20 @@ export default function MainMenu() {
   return (
     <Background className="flex flex-col items-center justify-center p-2 sm:p-4">
       <AppTitle title="Project Faith" subtitle="卡牌对战游戏" />
-      <Card className="max-w-md landscape:max-w-[460px]">
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-3 sm:space-y-4"
-        >
-          <div className="tabs tabs-boxed bg-base-200/70 mb-2 sm:mb-4 gap-1 sm:gap-2 flex">
+      <Card className="max-w-md landscape:max-w-[460px] animate-fade-in">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="tabs tabs-boxed bg-base-200/70 mb-3 gap-2 flex p-1 rounded-lg">
             <TabButton
               active={activeTab === "select"}
               label="选择卡组"
               onClick={() => handleTabChange("select")}
+              className="flex-1 transition-all duration-300"
             />
             <TabButton
               active={activeTab === "edit"}
               label="编辑卡组"
               onClick={() => handleTabChange("edit")}
+              className="flex-1 transition-all duration-300"
             />
           </div>
 
@@ -76,7 +75,10 @@ export default function MainMenu() {
               placeholder={
                 activeTab === "select" ? "输入卡组名称" : "创建或选择卡组"
               }
-              className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200 h-9 sm:h-10 md:h-12 min-h-0 text-sm sm:text-base"
+              className="input input-bordered w-full bg-white/20 backdrop-blur-sm 
+                text-white placeholder:text-gray-300 h-12 min-h-0
+                transition-all duration-200 focus:bg-white/30
+                focus:border-white/50"
               {...register("deck", { required: "请输入卡组名称" })}
               aria-invalid={errors.deck ? "true" : "false"}
               aria-describedby={errors.deck ? "deck-error" : undefined}
@@ -84,7 +86,7 @@ export default function MainMenu() {
             {errors.deck && (
               <div
                 id="deck-error"
-                className="text-error text-xs sm:text-sm mt-0.5"
+                className="text-error text-sm mt-1.5 pl-1"
                 role="alert"
               >
                 {errors.deck.message}
@@ -95,7 +97,10 @@ export default function MainMenu() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="btn btn-primary w-full h-9 sm:h-10 md:h-12 min-h-0 text-sm sm:text-base md:text-lg hover:brightness-110 transition-all duration-200 shadow-lg disabled:bg-gray-600/40 disabled:border-gray-500"
+            className="btn btn-primary w-full h-12 min-h-0 text-base
+              hover:brightness-110 transition-all duration-300
+              shadow-lg shadow-primary/20 hover:shadow-primary/30
+              disabled:bg-gray-600/40 disabled:border-gray-500"
           >
             {isSubmitting ? (
               <span className="loading loading-spinner" />
