@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Deck from "./pages/Deck";
-import Game from "./Game";
+import Game from "./pages/Game";
 import Login, { SessionGuard } from "./pages/Login";
 import MainMenu from "./pages/MainMenu";
 import "./index.css";

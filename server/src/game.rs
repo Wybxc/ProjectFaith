@@ -17,6 +17,7 @@ impl GlobalState {
     }
 }
 
+#[allow(dead_code)]
 pub struct PendingGame {
     username: String,
 }
