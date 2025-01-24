@@ -2,12 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import ScreenRotationGuard from "./components/ui/ScreenRotationGuard";
-import Deck from "./pages/DeckBuilder";
+import "./index.css";
+import DeckBuilder from "./pages/DeckBuilder";
 import Game from "./pages/Game";
 import MainMenu from "./pages/MainMenu";
 import NotFound from "./pages/NotFound";
-
-import "./index.css";
+import { routes } from "./routes";
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
@@ -18,8 +18,11 @@ if (rootEl) {
         <Routes>
           <Route path="/" element={<ScreenRotationGuard />}>
             <Route index element={<MainMenu />} />
-            <Route path="deck-builder" element={<Deck />} />
-            <Route path="game/:room" element={<Game />} />
+            <Route
+              path={routes.deckBuilder.$path()}
+              element={<DeckBuilder />}
+            />
+            <Route path={routes.game.$path()} element={<Game />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

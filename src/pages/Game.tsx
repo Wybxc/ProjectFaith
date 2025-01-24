@@ -1,7 +1,8 @@
-import { useParams } from "react-router";
+import { routes } from "@/routes";
+import { useTypedParams } from "react-router-typesafe-routes";
 
 export default function Game() {
-  const { room } = useParams();
+  const { room } = useTypedParams(routes.game);
 
-  return <></>;
+  return <>{room}</>;
 }

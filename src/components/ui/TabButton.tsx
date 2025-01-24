@@ -16,7 +16,11 @@ export function TabButton({
   return (
     <button
       type="button"
-      className={cn("tab", active && "tab-active", className)}
+      className={cn(
+        "tab h-10 px-4 rounded-lg font-medium",
+        active && "tab-active",
+        className,
+      )}
       onClick={onClick}
     >
       {label}

@@ -1,3 +1,56 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  /* Form Controls */
+  .form-input {
+    @apply bg-white/20 backdrop-blur-sm text-white 
+      transition-colors duration-200 focus:bg-white/30
+      h-12 min-h-0;
+  }
+
+  .input-primary {
+    @apply input input-bordered form-input;
+  }
+
+  .select-primary {
+    @apply select select-bordered form-input [&>option]:text-base-content;
+  }
+
+  .input-sm-primary {
+    @apply input input-bordered input-sm bg-white/20;
+  }
+
+  /* Buttons */
+  .btn-base {
+    @apply shadow-lg transition-colors duration-200;
+  }
+
+  .btn-game {
+    @apply btn btn-primary w-full h-12 min-h-0 text-base btn-base
+      hover:brightness-110 shadow-primary/20 hover:shadow-primary/30;
+  }
+
+  .btn-icon {
+    @apply btn btn-ghost btn-xs text-white/80 hover:text-white;
+  }
+
+  /* Panels */
+  .glass-panel {
+    @apply bg-white/20 rounded-lg backdrop-blur-sm;
+  }
+
+  .card-hover {
+    @apply glass-panel cursor-pointer transition-colors hover:bg-white/30;
+  }
+
+  /* Text */
+  .text-title {
+    @apply font-bold text-white;
+  }
+
+  .text-subtitle {
+    @apply text-white/90;
+  }
+}

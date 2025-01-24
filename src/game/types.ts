@@ -6,21 +6,21 @@ export interface Card {
   subtype: FaithCard | CharacterCard | ActionCard;
 }
 
-export type Faith = "justice" | "element" | "nature" | "any";
+export type Faith = "正义" | "元素" | "自然" | "任意";
 
 export interface FaithCard {
-  type: "faith";
+  type: "信念";
   faith: Faith;
 }
 
 export interface CharacterCard {
-  type: "character";
+  type: "角色";
   cost: Faith[];
   rarity: number;
 }
 
 export interface ActionCard {
-  type: "action";
+  type: "指令";
   cost: Faith[];
   rarity: number;
 }

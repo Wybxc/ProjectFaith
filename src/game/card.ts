@@ -12,8 +12,8 @@ defineCard({
   image: "TODO",
   description: "TODO",
   subtype: {
-    type: "character",
-    cost: ["justice"],
+    type: "角色",
+    cost: ["正义"],
     rarity: 0,
   },
 });
@@ -24,8 +24,8 @@ defineCard({
   image: "TODO",
   description: "TODO",
   subtype: {
-    type: "action",
-    cost: ["justice", "justice", "justice"],
+    type: "指令",
+    cost: ["正义", "正义", "正义"],
     rarity: 2,
   },
 });
@@ -36,8 +36,8 @@ defineCard({
   image: "TODO",
   description: "TODO",
   subtype: {
-    type: "action",
-    cost: ["element"],
+    type: "指令",
+    cost: ["元素"],
     rarity: 0,
   },
 });
