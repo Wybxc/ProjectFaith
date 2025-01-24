@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
-import Deck from "./pages/Deck";
+import Deck from "./pages/DeckBuilder";
 import Game from "./pages/Game";
-import Login, { SessionGuard } from "./pages/Login";
 import MainMenu from "./pages/MainMenu";
 import "./index.css";
+import ScreenRotationGuard from "./components/ui/ScreenRotationGuard";
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
@@ -14,10 +14,9 @@ if (rootEl) {
     <React.StrictMode>
       <BrowserRouter>
         <Routes>
-          <Route path="login" element={<Login />} />
-          <Route path="/" element={<SessionGuard />}>
+          <Route path="/" element={<ScreenRotationGuard />}>
             <Route index element={<MainMenu />} />
-            <Route path="deck" element={<Deck />} />
+            <Route path="deck-builder" element={<Deck />} />
             <Route path=":room" element={<Game />} />
           </Route>
         </Routes>

@@ -17,9 +17,6 @@ importers:
       jotai:
         specifier: ^2.11.1
         version: 2.11.1(@types/react@19.0.7)(react@19.0.0)
-      jotai-cache:
-        specifier: ^0.5.0
-        version: 0.5.0(jotai@2.11.1(@types/react@19.0.7)(react@19.0.0))
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
@@ -1016,11 +1013,6 @@ packages:
   jiti@1.21.7:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
     hasBin: true
-
-  jotai-cache@0.5.0:
-    resolution: {integrity: sha512-29pUuEfSXL7Ba6lxZmiNDARc73TspWzAzCy0jCkk2uEOnFJ6kaUBZTp/AZSwnIsh1ndfUfM9/QpbLU7uJAQL0A==}
-    peerDependencies:
-      jotai: '>=2.0.0'
 
   jotai@2.11.1:
     resolution: {integrity: sha512-41Su098mpHIX29hF/XOpDb0SqF6EES7+HXfrhuBqVSzRkxX48hD5i8nGsEewWZNAsBWJCTTmuz8M946Ih2PfcQ==}
@@ -2453,10 +2445,6 @@ snapshots:
       '@pkgjs/parseargs': 0.11.0
 
   jiti@1.21.7: {}
-
-  jotai-cache@0.5.0(jotai@2.11.1(@types/react@19.0.7)(react@19.0.0)):
-    dependencies:
-      jotai: 2.11.1(@types/react@19.0.7)(react@19.0.0)
 
   jotai@2.11.1(@types/react@19.0.7)(react@19.0.0):
     optionalDependencies:
