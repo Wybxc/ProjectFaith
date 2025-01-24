@@ -58,19 +58,33 @@ async fn main() -> Result<()> {
     io.ns(
         "/",
         |s: SocketRef, State::<AuthService>(auth_service), Data::<Auth>(auth)| {
-            let Some(claims) = auth_service.verify_token(&auth.token) else {
-                s.disconnect().ok();
-                return;
-            };
+            tracing::info!("{} connecting", s.id);
 
-            tracing::info!("{} connected", claims.user_id);
-            s.extensions.insert(claims);
+            match auth_service.verify_token(&auth.token) {
+                Ok(claims) => {
+                    tracing::info!("{} connected", claims.sub);
+                    s.extensions.insert(claims);
+                }
+                Err(e) => {
+                    tracing::info!("{} failed to connect: {}", s.id, e);
+                    s.disconnect().ok();
+                    return;
+                }
+            }
+
             s.on("createRoom", events::on_create_room);
             s.on("joinRoom", events::on_join_room);
         },
     );
 
     let app = axum::Router::new()
+        .nest(
+            "/api",
+            axum::Router::new()
+                .route("/login", post(auth::on_login))
+                .route("/signup", post(auth::on_signup))
+                .with_state(auth_service),
+        )
         .fallback_service(
             ServeDir::new(args.web.clone()).fallback(ServeFile::new(args.web.join("index.html"))),
         )
@@ -78,13 +92,6 @@ async fn main() -> Result<()> {
             ServiceBuilder::new()
                 .layer(CorsLayer::permissive())
                 .layer(socket_layer),
-        )
-        .nest(
-            "/api",
-            axum::Router::new()
-                .route("/login", post(auth::on_login))
-                .route("/signup", post(auth::on_signup))
-                .with_state(auth_service),
         );
 
     tracing::info!("Listening on {}:{}", args.listen, args.port);

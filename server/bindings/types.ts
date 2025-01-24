@@ -7,8 +7,9 @@ export interface Auth {
 }
 
 export interface Claims {
-	user_id: string;
-	version: number;
+	sub: string;
+	iat: number;
+	exp: number;
 }
 
 export interface CreateRoom {

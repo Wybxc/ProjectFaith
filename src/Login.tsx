@@ -1,11 +1,11 @@
 import axios from "axios";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Outlet, useNavigate } from "react-router";
 import typia from "typia";
 import type { Credentials } from "../server/bindings/types";
-import { tokenAtom } from "./auth";
+import { sessionAtom, tokenAtom } from "./auth";
 import { AppTitle } from "./components/ui/AppTitle";
 import { Card } from "./components/ui/Card";
 import { TabButton } from "./components/ui/TabButton";
@@ -199,14 +199,21 @@ export default function Login() {
 }
 
 export function SessionGuard() {
-  const [token] = useAtom(tokenAtom);
+  const setToken = useSetAtom(tokenAtom);
+  const session = useAtomValue(sessionAtom);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token) {
+    if (!session) {
+      navigate("/login");
+      return;
+    }
+
+    if (session.exp * 1000 < Date.now()) {
+      setToken(null);
       navigate("/login");
     }
-  }, [navigate, token]);
+  }, [navigate, session, setToken]);
 
   return <Outlet />;
 }

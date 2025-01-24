@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
 use axum::{http::StatusCode, response::IntoResponse, Form};
-use eyre::Result;
+use eyre::{OptionExt, Result};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use polodb_core::{bson::doc as bson, CollectionT, Database};
 use rand::{rngs::OsRng, Rng};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
+use time::OffsetDateTime;
 use typeshare::typeshare;
 
 const JWT_SECRET: &[u8] = b"your-secret-key"; // 在生产环境中应使用环境变量
@@ -16,8 +17,6 @@ pub struct User {
     id: String,
     salt: Vec<u8>,
     pw_hash: Vec<u8>,
-    #[serde(default = "Default::default")]
-    version: i32,
 }
 
 impl User {
@@ -25,12 +24,7 @@ impl User {
         let mut salt = vec![0; 16];
         OsRng.fill(&mut salt[..]);
         let pw_hash = hash_password(password, &salt);
-        Self {
-            id,
-            salt,
-            pw_hash,
-            version: Default::default(),
-        }
+        Self { id, salt, pw_hash }
     }
 
     pub fn authenticate(&self, password: &str) -> bool {
@@ -46,8 +40,9 @@ impl User {
 #[typeshare]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
-    pub user_id: String,
-    pub version: i32,
+    pub sub: String,
+    pub iat: f64, // 签发时间
+    pub exp: f64, // 过期时间
 }
 
 #[derive(Clone)]
@@ -74,13 +69,15 @@ impl AuthService {
     }
 
     fn create_token(&self, user: &User) -> jsonwebtoken::errors::Result<String> {
+        let now = OffsetDateTime::now_utc();
         let claims = Claims {
-            user_id: user.id().to_owned(),
-            version: user.version,
+            sub: user.id().to_owned(),
+            iat: now.unix_timestamp() as f64,
+            exp: (now + time::Duration::days(7)).unix_timestamp() as f64,
         };
 
         encode(
-            &Header::default(),
+            &Header::new(jsonwebtoken::Algorithm::HS256),
             &claims,
             &EncodingKey::from_secret(JWT_SECRET),
         )
@@ -99,25 +96,19 @@ impl AuthService {
         Ok(None)
     }
 
-    pub fn verify_token(&self, token: &str) -> Option<Claims> {
+    pub fn verify_token(&self, token: &str) -> Result<Claims> {
         let token_data = decode::<Claims>(
             token,
             &DecodingKey::from_secret(JWT_SECRET),
             &Validation::new(jsonwebtoken::Algorithm::HS256),
-        )
-        .ok()?;
+        )?;
 
         let collection = self.db.collection::<User>("users");
-        let user = collection
-            .find_one(bson! { "id": &token_data.claims.user_id })
-            .ok()??;
+        let _user = collection
+            .find_one(bson! { "id": &token_data.claims.sub })?
+            .ok_or_eyre("User not found")?;
 
-        // 验证token版本
-        if user.version == token_data.claims.version {
-            Some(token_data.claims)
-        } else {
-            None
-        }
+        Ok(token_data.claims)
     }
 }
 

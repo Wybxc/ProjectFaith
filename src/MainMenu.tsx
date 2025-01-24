@@ -1,8 +1,8 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { sessionAtom } from "./auth";
+import { sessionAtom, tokenAtom } from "./auth";
 import { AppTitle } from "./components/ui/AppTitle";
 import { Card } from "./components/ui/Card";
 import { TabButton } from "./components/ui/TabButton";
@@ -15,6 +15,7 @@ interface RoomForm {
 export default function MainMenu() {
   const socket = useAtomValue(socketAtom);
   const session = useAtomValue(sessionAtom);
+  const setToken = useSetAtom(tokenAtom);
   const [activeTab, setActiveTab] = useState<"join" | "create">("join");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -31,15 +32,17 @@ export default function MainMenu() {
     },
   });
 
+  if (!socket) return null;
+
   const onSubmit = async (data: RoomForm) => {
-    if (!session?.user_id) return;
+    if (!session?.sub) return;
     setIsSubmitting(true);
 
     try {
       const params =
         activeTab === "join"
-          ? { username: session.user_id, room: data.room }
-          : { username: session.user_id };
+          ? { username: session.sub, room: data.room }
+          : { username: session.sub };
 
       await new Promise((resolve, reject) => {
         socket.emit(
@@ -74,6 +77,11 @@ export default function MainMenu() {
     reset();
   };
 
+  const handleLogout = () => {
+    setToken("");
+    navigate("/login");
+  };
+
   if (!session) return null;
 
   return (
@@ -96,8 +104,15 @@ export default function MainMenu() {
             />
           </div>
 
-          <div className="text-white text-center bg-white/10 py-2 rounded-lg">
-            当前用户：{session.user_id}
+          <div className="text-white text-center bg-white/10 py-2 rounded-lg flex justify-between items-center px-4">
+            <span>当前用户：{session.sub}</span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-sm text-red-300 hover:text-red-400"
+            >
+              登出
+            </button>
           </div>
 
           {activeTab === "join" && (
