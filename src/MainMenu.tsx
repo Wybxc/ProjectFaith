@@ -85,13 +85,13 @@ export default function MainMenu() {
   if (!session) return null;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 bg-[url('@static/bg.jpg')] bg-cover bg-center relative">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 bg-[url('@static/bg.jpg')] bg-cover bg-center relative px-4">
       <div className="absolute inset-0 bg-black/60" />
       <AppTitle title="Project Faith" subtitle="在线多人游戏体验" />
 
       <Card>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="tabs tabs-boxed bg-base-200/70 mb-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="tabs tabs-boxed bg-base-200/70 mb-6 gap-2 flex">
             <TabButton
               active={activeTab === "join"}
               label="加入房间"
@@ -104,7 +104,7 @@ export default function MainMenu() {
             />
           </div>
 
-          <div className="text-white text-center bg-white/10 py-2 rounded-lg flex justify-between items-center px-4">
+          <div className="text-white text-center bg-white/10 py-3 rounded-lg flex justify-between items-center px-4">
             <span>当前用户：{session.sub}</span>
             <button
               type="button"
@@ -120,7 +120,7 @@ export default function MainMenu() {
               <input
                 type="text"
                 placeholder="房间号"
-                className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200"
+                className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200 h-12"
                 {...register("room", {
                   required: "请输入房间号",
                 })}
@@ -142,7 +142,7 @@ export default function MainMenu() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="btn btn-primary w-full hover:brightness-110 transition-all duration-200 shadow-lg disabled:bg-gray-600/40 disabled:border-gray-500 disabled:cursor-not-allowed"
+            className="btn btn-primary w-full hover:brightness-110 transition-all duration-200 shadow-lg disabled:bg-gray-600/40 disabled:border-gray-500 disabled:cursor-not-allowed h-12 text-lg"
           >
             {isSubmitting ? (
               <span className="loading loading-spinner" />

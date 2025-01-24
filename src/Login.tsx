@@ -86,13 +86,13 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 bg-[url('@static/bg.jpg')] bg-cover bg-center relative">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 bg-[url('@static/bg.jpg')] bg-cover bg-center relative px-4">
       <div className="absolute inset-0 bg-black/60" />
       <AppTitle title="Project Faith" subtitle="登录或注册以开始游戏" />
 
       <Card>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="tabs tabs-boxed bg-base-200/70 mb-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="tabs tabs-boxed bg-base-200/70 mb-6 gap-2 flex">
             <TabButton
               active={activeTab === "login"}
               label="登录"
@@ -107,13 +107,13 @@ export default function Login() {
 
           <div className="form-control">
             <label htmlFor="username" className="label">
-              <span className="label-text text-white">用户名</span>
+              <span className="label-text text-white text-base">用户名</span>
             </label>
             <input
               id="username"
               type="text"
               placeholder="用户名"
-              className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200"
+              className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200 h-12"
               {...register("username", { required: "请输入用户名" })}
             />
             {errors.username && (
@@ -125,13 +125,13 @@ export default function Login() {
 
           <div className="form-control">
             <label htmlFor="password" className="label">
-              <span className="label-text text-white">密码</span>
+              <span className="label-text text-white text-base">密码</span>
             </label>
             <input
               id="password"
               type="password"
               placeholder="密码"
-              className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200"
+              className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200 h-12"
               {...register("password", { required: "请输入密码" })}
             />
             {errors.password && (
@@ -144,13 +144,15 @@ export default function Login() {
           {activeTab === "register" && (
             <div className="form-control">
               <label htmlFor="confirmPassword" className="label">
-                <span className="label-text text-white">确认密码</span>
+                <span className="label-text text-white text-base">
+                  确认密码
+                </span>
               </label>
               <input
                 id="confirmPassword"
                 type="password"
                 placeholder="确认密码"
-                className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200"
+                className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200 h-12"
                 {...register("confirmPassword", {
                   required: "请确认密码",
                   validate: (value) =>
@@ -168,7 +170,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="btn btn-primary w-full hover:brightness-110 transition-all duration-200 shadow-lg disabled:bg-gray-600/40 disabled:border-gray-500 disabled:cursor-not-allowed"
+            className="btn btn-primary w-full hover:brightness-110 transition-all duration-200 shadow-lg disabled:bg-gray-600/40 disabled:border-gray-500 disabled:cursor-not-allowed h-12 text-lg"
           >
             {isSubmitting ? (
               <span className="loading loading-spinner" />
@@ -179,13 +181,13 @@ export default function Login() {
             )}
           </button>
 
-          <div className="text-center">
+          <div className="text-center py-2">
             <button
               type="button"
               onClick={() =>
                 handleTabChange(activeTab === "login" ? "register" : "login")
               }
-              className="text-white hover:text-primary transition-colors"
+              className="text-white hover:text-primary transition-colors text-base py-2"
             >
               {activeTab === "login"
                 ? "还没有账号？点击注册"
