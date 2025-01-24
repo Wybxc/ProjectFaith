@@ -6,6 +6,11 @@ export interface Auth {
 	token: string;
 }
 
+export interface Card {
+	index: string;
+	name: string;
+}
+
 export interface Claims {
 	sub: string;
 	iat: number;
@@ -28,6 +33,12 @@ export interface Credentials {
 export interface JoinRoom {
 	room: string;
 	username: string;
+}
+
+export enum CardType {
+	Faith = "Faith",
+	Order = "Order",
+	Character = "Character",
 }
 
 export enum JoinRoomResponse {

@@ -7,7 +7,9 @@
     "skipLibCheck": true,
     "useDefineForClassFields": true,
     "paths": {
-      "@static/*": ["./static/*"]
+      "@/*": ["./src/*"],
+      "@static/*": ["./static/*"],
+      "@server/*": ["./server/*"]
     },
     /* modules */
     "module": "ESNext",

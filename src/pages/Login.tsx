@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Outlet, useNavigate } from "react-router";
 import typia from "typia";
-import type { Credentials } from "../server/bindings/types";
-import { sessionAtom, tokenAtom } from "./auth";
-import { AppTitle } from "./components/ui/AppTitle";
-import { Card } from "./components/ui/Card";
-import { TabButton } from "./components/ui/TabButton";
+import type { Credentials } from "@server/bindings/types";
+import { sessionAtom, tokenAtom } from "@/auth";
+import { AppTitle } from "@/components/ui/AppTitle";
+import { Card } from "@/components/ui/Card";
+import { TabButton } from "@/components/ui/TabButton";
 
 interface LoginForm {
   username: string;

@@ -2,11 +2,11 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { sessionAtom, tokenAtom } from "./auth";
-import { AppTitle } from "./components/ui/AppTitle";
-import { Card } from "./components/ui/Card";
-import { TabButton } from "./components/ui/TabButton";
-import { socketAtom } from "./socket";
+import { sessionAtom, tokenAtom } from "@/auth";
+import { AppTitle } from "@/components/ui/AppTitle";
+import { Card } from "@/components/ui/Card";
+import { TabButton } from "@/components/ui/TabButton";
+import { socketAtom } from "@/socket";
 
 interface RoomForm {
   room: string;
