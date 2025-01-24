@@ -1,9 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./MainMenu";
-import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Game from "./Game";
+import Login, { SessionGuard } from "./Login";
+import MainMenu from "./MainMenu";
+import "./index.css";
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
@@ -12,8 +13,11 @@ if (rootEl) {
     <React.StrictMode>
       <BrowserRouter>
         <Routes>
-          <Route index element={<App />} />
-          <Route path=":room" element={<Game />} />
+          <Route path="login" element={<Login />} />
+          <Route path="/" element={<SessionGuard />}>
+            <Route index element={<MainMenu />} />
+            <Route path=":room" element={<Game />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </React.StrictMode>,

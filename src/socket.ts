@@ -1,3 +1,4 @@
+import { atom, useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { io, type Socket } from "socket.io-client";
 import type {
@@ -6,6 +7,7 @@ import type {
   JoinRoom,
   JoinRoomResponse,
 } from "../server/bindings/types";
+import { tokenAtom } from "./auth";
 
 type Event<Request, Response> = (
   request: Request,
@@ -21,19 +23,32 @@ interface ClientToServerEvents {
   joinRoom: Event<JoinRoom, JoinRoomResponse>;
 }
 
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  import.meta.env.MODE === "development" ? "http://localhost:3003" : undefined,
-);
+export const socketAtom = atom<
+  Socket<ServerToClientEvents, ClientToServerEvents>
+>((get) => {
+  const endpoint =
+    import.meta.env.MODE === "development"
+      ? "http://localhost:3003"
+      : undefined;
+
+  return io(endpoint, {
+    auth: {
+      token: get(tokenAtom),
+    },
+  });
+});
 
 export function useSocketEvent(
   event: keyof ServerToClientEvents,
   listener: ServerToClientEvents[keyof ServerToClientEvents],
 ) {
+  const socket = useAtomValue(socketAtom);
+
   useEffect(() => {
     socket.on(event, listener);
 
     return () => {
       socket.off(event, listener);
     };
-  }, [event, listener]);
+  }, [event, socket, listener]);
 }

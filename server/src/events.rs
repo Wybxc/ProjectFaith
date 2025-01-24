@@ -20,6 +20,7 @@ pub async fn on_create_room(
     s: SocketRef,
     Data(event): Data<CreateRoom>,
     State(state): State<GlobalState>,
+
     callback: AckSender,
 ) {
     let room = format!("room-{}", s.id);

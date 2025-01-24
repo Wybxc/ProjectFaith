@@ -1,120 +1,144 @@
+import { useAtomValue } from "jotai";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { socket } from "./socket.ts";
-import { useLocalStorage } from "react-use";
+import { sessionAtom } from "./auth";
+import { AppTitle } from "./components/ui/AppTitle";
+import { Card } from "./components/ui/Card";
+import { TabButton } from "./components/ui/TabButton";
+import { socketAtom } from "./socket";
+
+interface RoomForm {
+  room: string;
+}
 
 export default function MainMenu() {
-  const [username, setUsername] = useLocalStorage("project_faith_username", "");
-  const [room, setRoom] = useState("");
-  const [activeTab, setActiveTab] = useState("join");
+  const socket = useAtomValue(socketAtom);
+  const session = useAtomValue(sessionAtom);
+  const [activeTab, setActiveTab] = useState<"join" | "create">("join");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const handleJoinRoom = () => {
-    if (username && room) {
-      socket.emit("joinRoom", { username, room }, () => {
-        navigate(`/${room}`);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    setError,
+  } = useForm<RoomForm>({
+    defaultValues: {
+      room: "",
+    },
+  });
+
+  const onSubmit = async (data: RoomForm) => {
+    if (!session?.user_id) return;
+    setIsSubmitting(true);
+
+    try {
+      const params =
+        activeTab === "join"
+          ? { username: session.user_id, room: data.room }
+          : { username: session.user_id };
+
+      await new Promise((resolve, reject) => {
+        socket.emit(
+          activeTab === "join" ? "joinRoom" : "createRoom",
+          params,
+          (response: { room: string }) => {
+            if (response?.room) {
+              navigate(`/${response.room}`);
+              resolve(response);
+            } else {
+              reject(
+                new Error(
+                  activeTab === "join" ? "加入房间失败" : "创建房间失败",
+                ),
+              );
+            }
+          },
+        );
       });
+    } catch (err) {
+      setError("room", {
+        type: "manual",
+        message: err instanceof Error ? err.message : "操作失败，请稍后重试",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleCreateRoom = () => {
-    if (username) {
-      socket.emit("createRoom", { username }, (response) => {
-        navigate(`/${response.room}`);
-      });
-    }
+  const handleTabChange = (tab: "join" | "create") => {
+    setActiveTab(tab);
+    reset();
   };
+
+  if (!session) return null;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-base-200 bg-[url('@static/bg.jpg')] bg-cover bg-center relative">
       <div className="absolute inset-0 bg-black/60" />
-      <div className="z-10 text-center mb-8">
-        <h1 className="text-5xl font-bold mb-3 text-white tracking-wide drop-shadow-lg">
-          Project Faith
-        </h1>
-        <p className="text-gray-200 text-lg drop-shadow">在线多人游戏体验</p>
-      </div>
-      <div className="card w-96 bg-white/20 backdrop-blur-md shadow-2xl z-10 border border-white/30">
-        <div className="card-body">
+      <AppTitle title="Project Faith" subtitle="在线多人游戏体验" />
+
+      <Card>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="tabs tabs-boxed bg-base-200/70 mb-6">
-            <button
-              type="button"
-              onClick={() => setActiveTab("join")}
-              className={`tab flex-1 transition-all duration-200 ${
-                activeTab === "join"
-                  ? "tab-active bg-primary text-white shadow-md"
-                  : "text-white"
-              }`}
-            >
-              加入房间
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("create")}
-              className={`tab flex-1 transition-all duration-200 ${
-                activeTab === "create"
-                  ? "tab-active bg-primary text-white shadow-md"
-                  : "text-white"
-              }`}
-            >
-              创建房间
-            </button>
+            <TabButton
+              active={activeTab === "join"}
+              label="加入房间"
+              onClick={() => handleTabChange("join")}
+            />
+            <TabButton
+              active={activeTab === "create"}
+              label="创建房间"
+              onClick={() => handleTabChange("create")}
+            />
           </div>
 
-          {activeTab === "join" ? (
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="用户名"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200"
-              />
+          <div className="text-white text-center bg-white/10 py-2 rounded-lg">
+            当前用户：{session.user_id}
+          </div>
+
+          {activeTab === "join" && (
+            <div className="form-control">
               <input
                 type="text"
                 placeholder="房间号"
-                value={room}
-                onChange={(e) => setRoom(e.target.value)}
                 className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200"
+                {...register("room", {
+                  required: "请输入房间号",
+                })}
+                aria-invalid={errors.room ? "true" : "false"}
+                aria-describedby={errors.room ? "room-error" : undefined}
               />
-              <button
-                type="button"
-                onClick={handleJoinRoom}
-                className="btn btn-primary w-full hover:brightness-110 transition-all duration-200 shadow-lg 
-                disabled:bg-gray-600/40 disabled:border-gray-500 disabled:cursor-not-allowed 
-                disabled:hover:brightness-100 disabled:shadow-none disabled:border-2 
-                disabled:backdrop-blur-none disabled:hover:scale-100
-                disabled:text-white disabled:font-medium disabled:drop-shadow"
-                disabled={!username || !room}
-              >
-                {!username || !room ? "请填写完整信息" : "加入房间"}
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="用户名"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="input input-bordered w-full bg-white/20 backdrop-blur-sm text-white placeholder:text-gray-200"
-              />
-              <button
-                type="button"
-                onClick={handleCreateRoom}
-                className="btn btn-primary w-full hover:brightness-110 transition-all duration-200 shadow-lg 
-                disabled:bg-gray-600/40 disabled:border-gray-500 disabled:cursor-not-allowed 
-                disabled:hover:brightness-100 disabled:shadow-none disabled:border-2 
-                disabled:backdrop-blur-none disabled:hover:scale-100
-                disabled:text-white disabled:font-medium disabled:drop-shadow"
-                disabled={!username}
-              >
-                {!username ? "请输入用户名" : "创建房间"}
-              </button>
+              {errors.room && (
+                <div
+                  id="room-error"
+                  className="text-error text-sm mt-1"
+                  role="alert"
+                >
+                  {errors.room.message}
+                </div>
+              )}
             </div>
           )}
-        </div>
-      </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="btn btn-primary w-full hover:brightness-110 transition-all duration-200 shadow-lg disabled:bg-gray-600/40 disabled:border-gray-500 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? (
+              <span className="loading loading-spinner" />
+            ) : activeTab === "join" ? (
+              "加入房间"
+            ) : (
+              "创建房间"
+            )}
+          </button>
+        </form>
+      </Card>
     </div>
   );
 }
