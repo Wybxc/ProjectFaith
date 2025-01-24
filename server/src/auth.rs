@@ -16,7 +16,8 @@ pub struct User {
     id: String,
     salt: Vec<u8>,
     pw_hash: Vec<u8>,
-    version: i32, // 新增字段：token版本控制
+    #[serde(default = "Default::default")]
+    version: i32,
 }
 
 impl User {
@@ -28,7 +29,7 @@ impl User {
             id,
             salt,
             pw_hash,
-            version: 1, // 初始版本号
+            version: Default::default(),
         }
     }
 
@@ -120,6 +121,7 @@ impl AuthService {
     }
 }
 
+#[typeshare]
 #[derive(Clone, Deserialize)]
 pub struct Credentials {
     user_id: String,

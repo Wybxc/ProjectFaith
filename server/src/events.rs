@@ -55,7 +55,7 @@ pub async fn on_join_room(
     callback: AckSender,
 ) {
     let mut pending_games = state.pending_games.lock().await;
-    let Some(pending_game) = pending_games.remove(&event.room) else {
+    let Some(_pending_game) = pending_games.remove(&event.room) else {
         if state.games.read().await.contains_key(&event.room) {
             callback.send(&JoinRoomResponse::Full).ok();
         } else {

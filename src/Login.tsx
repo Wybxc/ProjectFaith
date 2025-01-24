@@ -1,7 +1,10 @@
+import axios from "axios";
 import { useAtom, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Outlet, useNavigate } from "react-router";
+import typia from "typia";
+import type { Credentials } from "../server/bindings/types";
 import { tokenAtom } from "./auth";
 import { AppTitle } from "./components/ui/AppTitle";
 import { Card } from "./components/ui/Card";
@@ -46,37 +49,31 @@ export default function Login() {
         return;
       }
 
-      const response = await fetch(
+      const response = await axios.post(
         activeTab === "login" ? "/api/login" : "/api/signup",
         {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            user_id: data.username,
-            password: data.password,
-          }),
-        },
+          user_id: data.username,
+          password: data.password,
+        } satisfies Credentials,
+        { headers: { "content-type": "application/x-www-form-urlencoded" } },
       );
-
-      if (!response.ok) {
-        throw new Error(
-          response.status === 401
-            ? "用户名或密码错误"
-            : response.status === 409
-              ? "用户名已存在"
-              : activeTab === "login"
-                ? "登录失败，请稍后重试"
-                : "注册失败，请稍后重试",
-        );
-      }
-
-      const result = await response.json();
-      setToken(result.token);
+      const token = typia.assert<string>(response.data);
+      setToken(token);
       navigate("/");
-    } catch (err: unknown) {
+    } catch (err) {
+      const errorMessage = axios.isAxiosError(err)
+        ? err.response?.status === 401
+          ? "用户名或密码错误"
+          : err.response?.status === 409
+            ? "用户名已存在"
+            : activeTab === "login"
+              ? "登录失败，请稍后重试"
+              : "注册失败，请稍后重试"
+        : "操作失败，请稍后重试";
+
       setError("username", {
         type: "manual",
-        message: err instanceof Error ? err.message : "操作失败，请稍后重试",
+        message: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
