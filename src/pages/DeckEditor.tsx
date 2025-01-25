@@ -3,9 +3,7 @@ import { cards } from "@/game/card";
 import type { Card, Faith } from "@/game/types";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { Background } from "@/components/ui/Background";
-import { useNavigate } from "react-router";
-import { useTypedParams } from "react-router-typesafe-routes";
-import { routes } from "@/routes";
+import { Router } from "@/routes";
 import {
   BiSearch,
   BiFilter,
@@ -48,9 +46,7 @@ const deckStorage = {
   },
 };
 
-export default function DeckBuilder() {
-  const { deckName } = useTypedParams(routes.deckBuilder);
-  const navigate = useNavigate();
+export default function DeckEditor({ deckName }: { deckName: string }) {
   const [search, setSearch] = useState("");
   const [selectedCards, setSelectedCards] = useState<Card[]>([]);
   const [filter, setFilter] = useState<"全部" | "角色" | "指令" | "信念">(
@@ -62,7 +58,7 @@ export default function DeckBuilder() {
   // 优化useEffect依赖
   useEffect(() => {
     if (!deckName) {
-      navigate("/");
+      Router.push("MainMenu");
       return;
     }
 
@@ -70,7 +66,7 @@ export default function DeckBuilder() {
     if (deck) {
       setSelectedCards(deck);
     }
-  }, [deckName, navigate]);
+  }, [deckName]);
 
   // 优化添加卡牌逻辑
   const handleAddCard = useCallback((card: Card) => {
@@ -133,12 +129,12 @@ export default function DeckBuilder() {
     if (!deckName) return;
 
     if (deckStorage.save(deckName, selectedCards)) {
-      navigate("/");
+      Router.push("MainMenu");
     } else {
       // 这里可以添加错误提示UI
       console.error("保存失败");
     }
-  }, [deckName, selectedCards, navigate]);
+  }, [deckName, selectedCards]);
 
   // 优化重命名逻辑
   const handleSaveDeckName = useCallback(() => {
@@ -156,9 +152,9 @@ export default function DeckBuilder() {
       }
     }
 
-    navigate(`/deck-builder/${newName}`, { replace: true });
+    Router.replace("DeckEditor", { deckName: newName });
     setIsEditingName(false);
-  }, [deckName, editedName, navigate]);
+  }, [deckName, editedName]);
 
   const getFaithCost = (faiths: Faith[]) =>
     faiths.map((faith) => (
@@ -172,6 +168,7 @@ export default function DeckBuilder() {
 
   return (
     <Background className="h-screen">
+      <title>{deckName ? `编辑卡组 - ${deckName}` : "新建卡组"}</title>
       <CardUI>
         <div className="grid grid-cols-2 lg:grid-cols-[1fr,360px] gap-3 h-full">
           {/* 左侧卡牌列表 */}

@@ -1,32 +1,40 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { match } from "ts-pattern";
 import ScreenRotationGuard from "./components/ui/ScreenRotationGuard";
 import "./index.css";
-import DeckBuilder from "./pages/DeckBuilder";
+import DeckEditor from "./pages/DeckEditor";
+import Decks from "./pages/Decks";
 import Game from "./pages/Game";
 import MainMenu from "./pages/MainMenu";
 import NotFound from "./pages/NotFound";
-import { routes } from "./routes";
+import { Router } from "./routes";
+
+const App = () => {
+  const route = Router.useRoute(["MainMenu", "Decks", "DeckEditor", "Game"]);
+
+  return (
+    <ScreenRotationGuard>
+      {match(route)
+        .with({ name: "MainMenu" }, () => <MainMenu />)
+        .with({ name: "Decks" }, () => <Decks />)
+        .with({ name: "DeckEditor" }, ({ params }) => (
+          <DeckEditor deckName={params.deckName} />
+        ))
+        .with({ name: "Game" }, ({ params }) => <Game room={params.room} />)
+        .otherwise(() => (
+          <NotFound />
+        ))}
+    </ScreenRotationGuard>
+  );
+};
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
   const root = ReactDOM.createRoot(rootEl);
   root.render(
     <React.StrictMode>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<ScreenRotationGuard />}>
-            <Route index element={<MainMenu />} />
-            <Route
-              path={routes.deckBuilder.$path()}
-              element={<DeckBuilder />}
-            />
-            <Route path={routes.game.$path()} element={<Game />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <App />
     </React.StrictMode>,
   );
 }

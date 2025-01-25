@@ -1,6 +1,7 @@
 import { Background } from "@/components/ui/Background";
 import { Card } from "@/components/ui/Card";
-import { Link } from "react-router";
+import { Router } from "@/routes";
+import { Link } from "@swan-io/chicane";
 import { motion } from "motion/react";
 
 export default function NotFound() {
@@ -8,6 +9,7 @@ export default function NotFound() {
 
   return (
     <Background className="flex items-center justify-center p-4">
+      <title>404 - 页面不存在</title>
       <Card className="max-w-md w-full animate-fade-in">
         <div className="text-center space-y-4">
           <h1 className="text-6xl font-bold text-white">404</h1>
@@ -17,7 +19,11 @@ export default function NotFound() {
               看起来你访问的页面已经离开了这个世界
             </p>
           </div>
-          <MotionLink to="/" whileTap={{ scale: 0.98 }} className="btn-game">
+          <MotionLink
+            to={Router.MainMenu()}
+            whileTap={{ scale: 0.98 }}
+            className="btn-game"
+          >
             返回主页
           </MotionLink>
         </div>
