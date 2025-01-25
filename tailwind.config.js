@@ -8,4 +8,7 @@ module.exports = {
     extend: {},
   },
   plugins: [daisyui, tailwindScrollbar],
+  daisyui: {
+    themes: ["cupcake"],
+  },
 };

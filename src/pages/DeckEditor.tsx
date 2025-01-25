@@ -179,7 +179,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
             {/* 搜索和筛选区域 */}
             <div className="flex flex-col sm:flex-row gap-2 flex-none">
               <div className="relative w-full">
-                <BiSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/60" />
+                <BiSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-200/60" />
                 <input
                   type="text"
                   placeholder="输入卡牌名称搜索..."
@@ -189,7 +189,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                 />
               </div>
               <div className="relative w-full sm:w-auto">
-                <BiFilter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/60" />
+                <BiFilter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-200/60" />
                 <select
                   className="select-primary w-full pl-9"
                   value={filter}
@@ -215,7 +215,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                     tabIndex={0}
                   >
                     <div className="flex justify-between items-start">
-                      <span className="text-title text-primary-content font-medium">
+                      <span className="text-title text-slate-100 font-medium">
                         {card.name}
                       </span>
                       {"cost" in card.subtype && (
@@ -224,10 +224,10 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                         </div>
                       )}
                     </div>
-                    <div className="text-subtitle text-sm mt-2 text-base-content opacity-90">
+                    <div className="text-subtitle text-sm mt-2 text-slate-200 opacity-90">
                       {card.description}
                     </div>
-                    <div className="text-xs text-base-content opacity-75 mt-1">
+                    <div className="text-xs text-slate-200 opacity-75 mt-1">
                       {card.subtype.type}
                       {"rarity" in card.subtype && ` - ★${card.subtype.rarity}`}
                     </div>
@@ -261,7 +261,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                   </div>
                 ) : (
                   <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-bold text-primary-content">
+                    <h2 className="text-lg font-bold text-slate-100">
                       {deckName}
                     </h2>
                     <button
@@ -288,10 +288,10 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                     className="flex justify-between items-center p-2 text-sm card-hover rounded"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-base-content">
+                      <span className="font-medium text-slate-100">
                         {card.name}{" "}
                         {count > 1 && (
-                          <span className="text-primary font-bold">
+                          <span className="text-slate-100 font-bold">
                             x{count}
                           </span>
                         )}
