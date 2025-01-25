@@ -9,7 +9,7 @@ export default defineCard({
   preface: true,
   subtype: {
     type: "角色",
-    cost: ["正义"],
+    cost: ["正义", "正义", "正义"],
     rarity: 3,
   },
 });

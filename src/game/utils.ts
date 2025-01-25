@@ -19,6 +19,24 @@ export function faithCost(card: Card): Record<Faith, number> {
   return cost;
 }
 
+/* 计算一组卡牌所提供的信念数量 */
+export function faithProvide(cards: Card[]): Record<Faith, number> {
+  const provide: Record<Faith, number> = {
+    正义: 0,
+    元素: 0,
+    自然: 0,
+    任意: 0,
+  };
+
+  for (const card of cards) {
+    if (card.subtype.type === "信念") {
+      provide[card.subtype.faith]++;
+    }
+  }
+
+  return provide;
+}
+
 /* 计算信念组成的总数量 */
 export function totalFaith(faith: Record<Faith, number>): number {
   return Object.values(faith).reduce((sum, count) => sum + count, 0);

@@ -14,7 +14,13 @@ import {
   BiX,
 } from "react-icons/bi";
 import typia from "typia";
-import { minFaith, minFaithReduce, totalFaith } from "@/game/utils";
+import {
+  canAfford,
+  faithProvide,
+  minFaith,
+  minFaithReduce,
+  totalFaith,
+} from "@/game/utils";
 
 const FAITH_COLORS: Record<Faith, string> = {
   正义: "badge-warning text-warning-content",
@@ -55,7 +61,32 @@ const deckStorage = {
 const validateDeck = (cards: Card[]) => {
   const errors: string[] = [];
 
-  return errors;
+  // 需要有27张卡牌
+  if (cards.length !== 27) {
+    errors.push("卡组数量不足");
+  }
+
+  // 启言不能超过1张
+  const prefaceCount = cards.filter((card) => card.preface).length;
+  if (prefaceCount > 1) {
+    errors.push("启言卡牌多于1张");
+  }
+
+  // 需要有三张信念牌
+  const faithCards = cards.filter((card) => card.subtype.type === "信念");
+  if (faithCards.length !== 3) {
+    errors.push("需要三张信念牌");
+  }
+
+  // 卡牌费用需要被信念牌覆盖
+  const faithProvides = faithProvide(cards);
+  for (const card of cards) {
+    if (!canAfford(faithProvides, card)) {
+      errors.push(`卡牌 ${card.name} 的信念要求不满足`);
+    }
+  }
+
+  return Array.from(new Set(errors));
 };
 
 export default function DeckEditor({ deckName }: { deckName: string }) {
@@ -68,13 +99,13 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
   const [editedName, setEditedName] = useState(deckName || "");
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  const faithCost = useMemo(() => minFaith(selectedCards), [selectedCards]);
-  const affordableCards = useMemo(
+  const deckFaithCost = useMemo(() => minFaith(selectedCards), [selectedCards]);
+  const availableCardIds = useMemo(
     () =>
       cards
-        .filter((card) => totalFaith(minFaithReduce(faithCost, card)) <= 3)
+        .filter((card) => totalFaith(minFaithReduce(deckFaithCost, card)) <= 3)
         .map((card) => card.id),
-    [faithCost],
+    [deckFaithCost],
   );
 
   // 优化useEffect依赖
@@ -124,6 +155,17 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
     });
   }, []);
 
+  // 添加检查卡牌是否达到上限的函数
+  const isCardUnavailable = useCallback(
+    (card: Card) => {
+      const sameNameCount = selectedCards.filter(
+        (c) => c.name === card.name,
+      ).length;
+      return sameNameCount >= 3;
+    },
+    [selectedCards],
+  );
+
   // 优化过滤逻辑
   const filteredCards = useMemo(
     () =>
@@ -136,16 +178,21 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
           return nameMatch && typeMatch;
         })
         .sort((a, b) => {
-          // 先按是否可选择排序
-          const aAffordable = affordableCards.includes(a.id);
-          const bAffordable = affordableCards.includes(b.id);
-          if (aAffordable !== bAffordable) {
-            return aAffordable ? -1 : 1;
+          // 检查卡牌是否可用
+          const aUnavailable = isCardUnavailable(a);
+          const bUnavailable = isCardUnavailable(b);
+          if (aUnavailable !== bUnavailable) {
+            return aUnavailable ? 1 : -1;
           }
-          // 再按ID排序
+          // 再按信仰需求排序
+          const aHasFaith = availableCardIds.includes(a.id);
+          const bHasFaith = availableCardIds.includes(b.id);
+          if (aHasFaith !== bHasFaith) {
+            return aHasFaith ? -1 : 1;
+          }
           return a.id.localeCompare(b.id);
         }),
-    [search, filter, affordableCards],
+    [search, filter, availableCardIds, isCardUnavailable],
   );
 
   // 优化分组逻辑
@@ -250,20 +297,28 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
             <div className="flex-1 overflow-auto mt-2 min-h-0 scrollbar-card">
               <div className="grid auto-rows-max grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 p-2">
                 {filteredCards.map((card) => {
-                  const isAffordable = affordableCards.includes(card.id);
+                  const hasFaith = availableCardIds.includes(card.id);
+                  const isUnavailable = isCardUnavailable(card);
+                  const isAvailable = hasFaith && !isUnavailable;
                   return (
                     <button
                       key={card.id}
                       className={`p-3 cursor-pointer transition-opacity ${
-                        isAffordable
+                        isAvailable
                           ? "card-hover"
                           : "opacity-50 cursor-not-allowed"
                       }`}
-                      onClick={() => isAffordable && handleAddCard(card)}
+                      onClick={() => isAvailable && handleAddCard(card)}
                       type="button"
-                      tabIndex={isAffordable ? 0 : -1}
-                      disabled={!isAffordable}
-                      title={!isAffordable ? "信仰要求不满足" : undefined}
+                      tabIndex={isAvailable ? 0 : -1}
+                      disabled={!isAvailable}
+                      title={
+                        isUnavailable
+                          ? "已达到最大数量限制"
+                          : !hasFaith
+                            ? "信仰要求不满足"
+                            : undefined
+                      }
                     >
                       <div className="flex justify-between items-start">
                         <span className="text-title text-slate-100 font-medium">
@@ -336,7 +391,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
               <div className="flex items-center justify-between gap-2 p-2 glass-panel rounded-lg">
                 <span className="text-sm text-slate-200">信念组成：</span>
                 <div className="flex gap-1">
-                  {(Object.entries(faithCost) as [Faith, number][]).map(
+                  {(Object.entries(deckFaithCost) as [Faith, number][]).map(
                     ([faith, cost]) =>
                       cost > 0 && (
                         <span
@@ -347,14 +402,14 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                         </span>
                       ),
                   )}
-                  {Object.values(faithCost).every((v) => v === 0) && (
+                  {Object.values(deckFaithCost).every((v) => v === 0) && (
                     <span className="text-sm text-slate-400">无</span>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto min-h-0 border border-base-300 glass-panel mb-4 rounded-lg scrollbar-card">
+            <div className="flex-1 overflow-auto min-h-0 glass-panel mb-4 rounded-lg scrollbar-card">
               <div className="space-y-1 p-2">
                 {groupedSelectedCards.map(({ card, count }) => (
                   <div
