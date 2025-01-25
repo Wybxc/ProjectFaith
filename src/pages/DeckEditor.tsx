@@ -1,5 +1,5 @@
 import { Card as CardUI } from "@/components/ui/Card";
-import { cards } from "@/game/card";
+import { cards } from "@/game/cards";
 import type { Card, Faith } from "@/game/types";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { Background } from "@/components/ui/Background";
@@ -20,6 +20,9 @@ const FAITH_COLORS: Record<Faith, string> = {
   自然: "badge-success text-success-content",
   任意: "badge-neutral text-neutral-content",
 };
+
+const getFaithId = (cardId: string, faith: Faith, position: number) =>
+  `${cardId}-${faith}-pos${position}`;
 
 // 提取本地存储操作
 const deckStorage = {
@@ -156,10 +159,10 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
     setIsEditingName(false);
   }, [deckName, editedName]);
 
-  const getFaithCost = (faiths: Faith[]) =>
-    faiths.map((faith) => (
+  const getFaithCost = (faiths: Faith[], cardId: string) =>
+    faiths.map((faith, pos) => (
       <span
-        key={faith}
+        key={getFaithId(cardId, faith, pos)}
         className={`badge ${FAITH_COLORS[faith]} badge-sm mx-0.5 font-medium`}
       >
         {faith}
@@ -167,12 +170,13 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
     ));
 
   return (
-    <Background className="h-screen">
+    <Background>
       <title>{deckName ? `编辑卡组 - ${deckName}` : "新建卡组"}</title>
-      <CardUI>
-        <div className="grid grid-cols-2 lg:grid-cols-[1fr,360px] gap-3 h-full">
+      <CardUI className="flex-1" variant="fill">
+        <div className="flex h-full gap-3">
           {/* 左侧卡牌列表 */}
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col min-h-0 basis-3/4 lg:basis-2/3 xl:basis-3/4">
+            {/* 搜索和筛选区域 */}
             <div className="flex flex-col sm:flex-row gap-2 flex-none">
               <div className="relative w-full">
                 <BiSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/60" />
@@ -199,8 +203,9 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto mt-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 content-start">
+            {/* 卡牌列表区域 */}
+            <div className="flex-1 overflow-auto mt-2 min-h-0 scrollbar-card">
+              <div className="grid auto-rows-max grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 p-2">
                 {filteredCards.map((card) => (
                   <button
                     key={card.id}
@@ -215,7 +220,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                       </span>
                       {"cost" in card.subtype && (
                         <div className="flex flex-wrap justify-end">
-                          {getFaithCost(card.subtype.cost)}
+                          {getFaithCost(card.subtype.cost, card.id)}
                         </div>
                       )}
                     </div>
@@ -233,7 +238,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
           </div>
 
           {/* 右侧卡组列表 */}
-          <div className="flex flex-col min-h-0">
+          <div className="flex flex-col min-h-0 basis-1/4 lg:basis-1/3 xl:basis-1/4">
             <div className="flex flex-col gap-3 mb-4 flex-none">
               <div className="flex justify-between items-center">
                 {isEditingName ? (
@@ -275,7 +280,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto border border-base-300 glass-panel mb-4 rounded-lg">
+            <div className="flex-1 overflow-auto min-h-0 border border-base-300 glass-panel mb-4 rounded-lg scrollbar-card">
               <div className="space-y-1 p-2">
                 {groupedSelectedCards.map(({ card, count }) => (
                   <div
@@ -293,7 +298,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                       </span>
                       {"cost" in card.subtype && (
                         <div className="flex">
-                          {getFaithCost(card.subtype.cost)}
+                          {getFaithCost(card.subtype.cost, card.id)}
                         </div>
                       )}
                     </div>

@@ -1,8 +1,10 @@
 export interface Card {
   id: string;
   name: string;
-  image: string;
+  honor?: string;
   description: string;
+  preface?: boolean;
+  collection: "正义" | "元素" | "自然" | "中立";
   subtype: FaithCard | CharacterCard | ActionCard;
 }
 

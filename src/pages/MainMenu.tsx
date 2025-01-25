@@ -8,7 +8,7 @@ export default function MainMenu() {
     <Background className="flex flex-col items-center justify-center p-2 sm:p-4">
       <title>信念计划</title>
       <AppTitle title="信念计划" subtitle="卡牌对战游戏" />
-      <Card className="max-w-md landscape:max-w-[460px] animate-fade-in">
+      <Card className="w-[90%] max-w-[360px] landscape:max-w-[420px] animate-fade-in">
         <div className="space-y-3">
           <button
             type="button"
