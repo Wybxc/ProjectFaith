@@ -11,8 +11,10 @@ import {
   BiEdit,
   BiMinus,
   BiTrash,
+  BiX,
 } from "react-icons/bi";
 import typia from "typia";
+import { minFaith, minFaithReduce, totalFaith } from "@/game/utils";
 
 const FAITH_COLORS: Record<Faith, string> = {
   正义: "badge-warning text-warning-content",
@@ -49,6 +51,13 @@ const deckStorage = {
   },
 };
 
+// 添加卡组验证函数
+const validateDeck = (cards: Card[]) => {
+  const errors: string[] = [];
+
+  return errors;
+};
+
 export default function DeckEditor({ deckName }: { deckName: string }) {
   const [search, setSearch] = useState("");
   const [selectedCards, setSelectedCards] = useState<Card[]>([]);
@@ -57,6 +66,16 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
   );
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(deckName || "");
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  const faithCost = useMemo(() => minFaith(selectedCards), [selectedCards]);
+  const affordableCards = useMemo(
+    () =>
+      cards
+        .filter((card) => totalFaith(minFaithReduce(faithCost, card)) <= 3)
+        .map((card) => card.id),
+    [faithCost],
+  );
 
   // 优化useEffect依赖
   useEffect(() => {
@@ -71,10 +90,21 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
     }
   }, [deckName]);
 
+  // 更新验证状态
+  useEffect(() => {
+    const errors = validateDeck(selectedCards);
+    setValidationErrors(errors);
+  }, [selectedCards]);
+
   // 优化添加卡牌逻辑
   const handleAddCard = useCallback((card: Card) => {
     setSelectedCards((prev) => {
-      if (prev.length >= 30) return prev;
+      if (prev.length >= 27) return prev;
+
+      // 检查同名卡牌数量
+      const sameNameCount = prev.filter((c) => c.name === card.name).length;
+      if (sameNameCount >= 3) return prev;
+
       return [...prev, card];
     });
   }, []);
@@ -105,8 +135,17 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
           const typeMatch = filter === "全部" || card.subtype.type === filter;
           return nameMatch && typeMatch;
         })
-        .sort((a, b) => a.id.localeCompare(b.id)),
-    [search, filter],
+        .sort((a, b) => {
+          // 先按是否可选择排序
+          const aAffordable = affordableCards.includes(a.id);
+          const bAffordable = affordableCards.includes(b.id);
+          if (aAffordable !== bAffordable) {
+            return aAffordable ? -1 : 1;
+          }
+          // 再按ID排序
+          return a.id.localeCompare(b.id);
+        }),
+    [search, filter, affordableCards],
   );
 
   // 优化分组逻辑
@@ -131,10 +170,14 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
   const handleSaveDeck = useCallback(() => {
     if (!deckName) return;
 
+    const errors = validateDeck(selectedCards);
+    if (errors.length > 0) {
+      return; // 如果有错误，阻止保存
+    }
+
     if (deckStorage.save(deckName, selectedCards)) {
       Router.push("MainMenu");
     } else {
-      // 这里可以添加错误提示UI
       console.error("保存失败");
     }
   }, [deckName, selectedCards]);
@@ -206,33 +249,43 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
             {/* 卡牌列表区域 */}
             <div className="flex-1 overflow-auto mt-2 min-h-0 scrollbar-card">
               <div className="grid auto-rows-max grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 p-2">
-                {filteredCards.map((card) => (
-                  <button
-                    key={card.id}
-                    className="p-3 card-hover cursor-pointer"
-                    onClick={() => handleAddCard(card)}
-                    type="button"
-                    tabIndex={0}
-                  >
-                    <div className="flex justify-between items-start">
-                      <span className="text-title text-slate-100 font-medium">
-                        {card.name}
-                      </span>
-                      {"cost" in card.subtype && (
-                        <div className="flex flex-wrap justify-end">
-                          {getFaithCost(card.subtype.cost, card.id)}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-subtitle text-sm mt-2 text-slate-200 opacity-90">
-                      {card.description}
-                    </div>
-                    <div className="text-xs text-slate-200 opacity-75 mt-1">
-                      {card.subtype.type}
-                      {"rarity" in card.subtype && ` - ★${card.subtype.rarity}`}
-                    </div>
-                  </button>
-                ))}
+                {filteredCards.map((card) => {
+                  const isAffordable = affordableCards.includes(card.id);
+                  return (
+                    <button
+                      key={card.id}
+                      className={`p-3 cursor-pointer transition-opacity ${
+                        isAffordable
+                          ? "card-hover"
+                          : "opacity-50 cursor-not-allowed"
+                      }`}
+                      onClick={() => isAffordable && handleAddCard(card)}
+                      type="button"
+                      tabIndex={isAffordable ? 0 : -1}
+                      disabled={!isAffordable}
+                      title={!isAffordable ? "信仰要求不满足" : undefined}
+                    >
+                      <div className="flex justify-between items-start">
+                        <span className="text-title text-slate-100 font-medium">
+                          {card.name}
+                        </span>
+                        {"cost" in card.subtype && (
+                          <div className="flex flex-wrap justify-end">
+                            {getFaithCost(card.subtype.cost, card.id)}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-subtitle text-sm mt-2 text-slate-200 opacity-90">
+                        {card.description}
+                      </div>
+                      <div className="text-xs text-slate-200 opacity-75 mt-1">
+                        {card.subtype.type}
+                        {"rarity" in card.subtype &&
+                          ` - ★${card.subtype.rarity}`}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -275,8 +328,29 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                   </div>
                 )}
                 <span className="badge badge-primary ml-3" title="卡组数量">
-                  {selectedCards.length}/30
+                  {selectedCards.length}/27
                 </span>
+              </div>
+
+              {/* 添加信仰消耗显示 */}
+              <div className="flex items-center justify-between gap-2 p-2 glass-panel rounded-lg">
+                <span className="text-sm text-slate-200">信念组成：</span>
+                <div className="flex gap-1">
+                  {(Object.entries(faithCost) as [Faith, number][]).map(
+                    ([faith, cost]) =>
+                      cost > 0 && (
+                        <span
+                          key={faith}
+                          className={`badge ${FAITH_COLORS[faith]} badge-sm font-medium`}
+                        >
+                          {faith} x{cost}
+                        </span>
+                      ),
+                  )}
+                  {Object.values(faithCost).every((v) => v === 0) && (
+                    <span className="text-sm text-slate-400">无</span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -287,22 +361,24 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                     key={card.id}
                     className="flex justify-between items-center p-2 text-sm card-hover rounded"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-100">
-                        {card.name}{" "}
-                        {count > 1 && (
-                          <span className="text-slate-100 font-bold">
-                            x{count}
-                          </span>
-                        )}
-                      </span>
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="truncate">
+                        <span className="font-medium text-slate-100">
+                          {card.name}{" "}
+                          {count > 1 && (
+                            <span className="text-slate-100 font-bold">
+                              x{count}
+                            </span>
+                          )}
+                        </span>
+                      </div>
                       {"cost" in card.subtype && (
-                        <div className="flex">
+                        <div className="flex flex-none">
                           {getFaithCost(card.subtype.cost, card.id)}
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-2 min-w-[80px] justify-end">
+                    <div className="flex gap-2 flex-none ml-2">
                       <button
                         type="button"
                         className="btn-icon text-error hover:bg-error hover:text-error-content transition-colors"
@@ -325,13 +401,37 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
               </div>
             </div>
 
+            {/* 添加验证错误提示 */}
+            {validationErrors.length > 0 && (
+              <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded-lg">
+                <div className="text-error font-medium mb-2">
+                  卡组存在以下问题：
+                </div>
+                <ul className="text-sm space-y-1">
+                  {validationErrors.map((error) => (
+                    <li
+                      key={error}
+                      className="flex items-center gap-2 text-error/90"
+                    >
+                      <BiX className="flex-none w-4 h-4" />
+                      {error}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <button
               type="button"
-              className="btn-game gap-2"
+              className={`btn-game gap-2 ${validationErrors.length > 0 ? "btn-disabled" : ""}`}
               onClick={handleSaveDeck}
+              disabled={validationErrors.length > 0}
             >
               <BiSave className="w-5 h-5" />
               保存卡组
+              {validationErrors.length > 0 && (
+                <span className="text-sm">（请先修正错误）</span>
+              )}
             </button>
           </div>
         </div>
