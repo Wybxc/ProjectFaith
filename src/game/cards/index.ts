@@ -1,26 +1,22 @@
 import type { Card } from "@/game/types";
 import typia from "typia";
 
-export function defineCard(card: Card) {
-  return card;
-}
-
 interface CardModule {
   default: Card;
 }
 
-const cardModules = import.meta.webpackContext("./", {
-  recursive: true,
-  regExp: /\w+\d+\.ts$/,
-});
-
-export const cards = cardModules
-  .keys()
-  .map((key) => {
+export const cards = Object.entries(
+  import.meta.glob(["./**/*.ts", "!./index.ts"], {
+    eager: true,
+  }),
+)
+  .map(([key, module]) => {
     try {
-      return typia.assert<CardModule>(cardModules(key)).default;
+      return typia.assert<CardModule>(module).default;
     } catch (e) {
       console.error(`Error loading card ${key}:`, e);
     }
   })
   .filter(Boolean) as Card[];
+
+export const cardMap = new Map(cards.map((card) => [card.id, card]));

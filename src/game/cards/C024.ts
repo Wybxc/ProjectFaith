@@ -1,6 +1,6 @@
-import { defineCard } from ".";
+import type { Card } from "@/game/types";
 
-export default defineCard({
+export default {
   id: "C024",
   name: "露娜",
   honor: "元素行侣",
@@ -12,4 +12,4 @@ export default defineCard({
     cost: ["元素", "元素", "元素"],
     rarity: 3,
   },
-});
+} satisfies Card;

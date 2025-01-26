@@ -1,6 +1,6 @@
-import { defineCard } from ".";
+import type { Card } from "@/game/types";
 
-export default defineCard({
+export default {
   id: "F001",
   name: "正义",
   description: "TODO",
@@ -9,4 +9,4 @@ export default defineCard({
     type: "信念",
     faith: "正义",
   },
-});
+} satisfies Card;

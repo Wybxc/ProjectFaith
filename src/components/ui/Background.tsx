@@ -10,7 +10,7 @@ export function Background({ children, className }: BackgroundProps) {
     <div
       className={cn(
         "h-screen bg-base-200 bg-cover bg-center relative",
-        "bg-[url('@static/bg.jpg')] flex",
+        "bg-[url('/bg.jpg')] flex",
         className,
       )}
     >

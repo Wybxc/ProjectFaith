@@ -6,14 +6,18 @@ import {
   minFaith,
   canAfford,
   faithProvide,
+  serializeDeck,
+  deserializeDeck,
 } from "./utils";
 import type { Card } from "./types";
+import { cardMap, cards } from "./cards";
+import { a } from "vitest/dist/chunks/suite.BJU7kdY9.js";
 
 describe("utils", () => {
   describe("faithCost", () => {
     it("should calculate faith cost for a card", () => {
       const card: Card = {
-        id: "test",
+        id: "it",
         name: "测试卡牌",
         description: "测试卡牌",
         collection: "中立",
@@ -56,7 +60,7 @@ describe("utils", () => {
       };
 
       const card: Card = {
-        id: "test",
+        id: "it",
         name: "测试卡牌",
         description: "测试卡牌",
         collection: "中立",
@@ -233,6 +237,60 @@ describe("utils", () => {
         自然: 0,
         任意: 0,
       });
+    });
+  });
+
+  describe("deck serialization", () => {
+    it("empty deck", () => {
+      const empty: Card[] = [];
+      const serialized = serializeDeck(empty);
+      expect(deserializeDeck(serialized)).toEqual(empty);
+    });
+
+    it("single card", () => {
+      const deck = [cards[0]];
+      const serialized = serializeDeck(deck);
+      expect(deserializeDeck(serialized)).toEqual(deck);
+    });
+
+    it("multiple same cards", () => {
+      const card = cards[0];
+      const deck = Array(3).fill(card);
+      const serialized = serializeDeck(deck);
+      expect(deserializeDeck(serialized)).toEqual(deck);
+    });
+
+    it("multiple different cards", () => {
+      const deck = cards.slice(0, 5).sort((a, b) => a.id.localeCompare(b.id));
+      const serialized = serializeDeck(deck);
+      const deserialized = deserializeDeck(serialized).sort((a, b) =>
+        a.id.localeCompare(b.id),
+      );
+      expect(deserialized).toEqual(deck);
+    });
+
+    it("serialization format", () => {
+      const cards = Array.from(cardMap.values()).slice(0, 3);
+      const serialized = serializeDeck(cards);
+      expect(typeof serialized).toBe("string");
+      expect(serialized).toMatch(/^[A-Za-z0-9_-]+$/); // base64url 格式验证
+    });
+
+    it("roundtrip consistency", () => {
+      for (let i = 0; i < cards.length; i += 5) {
+        const deck = cards
+          .slice(i, i + 5)
+          .sort((a, b) => a.id.localeCompare(b.id));
+        const serialized = serializeDeck(deck);
+        const deserialized = deserializeDeck(serialized).sort((a, b) =>
+          a.id.localeCompare(b.id),
+        );
+        expect(deserialized).toEqual(deck);
+      }
+    });
+
+    it("invalid serialized string", () => {
+      expect(() => deserializeDeck("invalid-base64")).toThrow();
     });
   });
 });

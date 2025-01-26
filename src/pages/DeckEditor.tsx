@@ -12,14 +12,16 @@ import {
   BiMinus,
   BiTrash,
   BiX,
+  BiCopy, // 添加复制图标
 } from "react-icons/bi";
-import typia from "typia";
 import {
   canAfford,
   faithProvide,
   minFaith,
   minFaithReduce,
   totalFaith,
+  serializeDeck, // 添加序列化函数
+  deserializeDeck, // 添加反序列化函数
 } from "@/game/utils";
 
 const FAITH_COLORS: Record<Faith, string> = {
@@ -32,12 +34,12 @@ const FAITH_COLORS: Record<Faith, string> = {
 const getFaithId = (cardId: string, faith: Faith, position: number) =>
   `${cardId}-${faith}-pos${position}`;
 
-// 提取本地存储操作
+// 修改本地存储操作使用序列化
 const deckStorage = {
   get: (name: string) => {
     try {
       const data = localStorage.getItem(`deck:${name}`);
-      return data ? typia.json.assertParse<Card[]>(data) : null;
+      return data ? deserializeDeck(data) : null;
     } catch (e) {
       console.error("Failed to load deck:", e);
       return null;
@@ -45,7 +47,7 @@ const deckStorage = {
   },
   save: (name: string, cards: Card[]) => {
     try {
-      localStorage.setItem(`deck:${name}`, JSON.stringify(cards));
+      localStorage.setItem(`deck:${name}`, serializeDeck(cards));
       return true;
     } catch (e) {
       console.error("Failed to save deck:", e);
@@ -98,6 +100,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(deckName || "");
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [copySuccess, setCopySuccess] = useState(false); // 添加复制成功状态
 
   const deckFaithCost = useMemo(() => minFaith(selectedCards), [selectedCards]);
   const availableCardIds = useMemo(
@@ -222,9 +225,7 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
       return; // 如果有错误，阻止保存
     }
 
-    if (deckStorage.save(deckName, selectedCards)) {
-      Router.push("MainMenu");
-    } else {
+    if (!deckStorage.save(deckName, selectedCards)) {
       console.error("保存失败");
     }
   }, [deckName, selectedCards]);
@@ -248,6 +249,18 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
     Router.replace("DeckEditor", { deckName: newName });
     setIsEditingName(false);
   }, [deckName, editedName]);
+
+  // 添加复制卡组代码的函数
+  const handleCopyDeck = useCallback(async () => {
+    const deckCode = serializeDeck(selectedCards);
+    try {
+      await navigator.clipboard.writeText(deckCode);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000); // 2秒后隐藏提示
+    } catch (err) {
+      console.error("Failed to copy deck code:", err);
+    }
+  }, [selectedCards]);
 
   const getFaithCost = (faiths: Faith[], cardId: string) =>
     faiths.map((faith, pos) => (
@@ -382,9 +395,19 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
                     </button>
                   </div>
                 )}
-                <span className="badge badge-primary ml-3" title="卡组数量">
-                  {selectedCards.length}/27
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="badge badge-primary" title="卡组数量">
+                    {selectedCards.length}/27
+                  </span>
+                  <button
+                    type="button"
+                    className={`btn-icon ${copySuccess ? "text-success" : ""}`}
+                    onClick={handleCopyDeck}
+                    title={copySuccess ? "已复制卡组代码" : "复制卡组代码"}
+                  >
+                    <BiCopy className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* 添加信仰消耗显示 */}

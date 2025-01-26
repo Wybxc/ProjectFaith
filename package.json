@@ -3,17 +3,18 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "rsbuild dev --open",
-    "build": "rsbuild build",
-    "preview": "rsbuild preview",
+    "dev": "vite dev --open",
+    "build": "vite build",
+    "preview": "vite preview",
     "format": "biome format --fix",
     "lint": "biome lint",
     "test": "vitest",
     "check:format": "biome format",
-    "prepare": "ts-patch install && husky"
+    "prepare": "ts-patch install && typia patch && husky"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
+    "@msgpack/msgpack": "3.0.0-beta3",
     "@swan-io/chicane": "^2.1.0",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
@@ -25,6 +26,7 @@
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.4.0",
     "react-use": "^17.6.0",
+    "rfc4648": "^1.5.4",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.6.0",
     "ts-pattern": "^5.6.2",
@@ -32,17 +34,20 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@rsbuild/core": "^1.1.8",
-    "@rsbuild/plugin-react": "^1.0.7",
-    "@ryoppippi/unplugin-typia": "npm:@jsr/ryoppippi__unplugin-typia@^1.2.0",
+    "@ryoppippi/unplugin-typia": "^1.2.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react-swc": "^3.7.2",
+    "@vitest/ui": "^3.0.4",
     "daisyui": "^4.12.23",
     "husky": "^9.1.7",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "^3.4.17",
     "ts-patch": "^3.3.0",
     "typescript": "~5.7.3",
+    "vite": "^6.0.11",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.4"
-  }
+  },
+  "packageManager": "pnpm@10.0.0+sha512.b8fef5494bd3fe4cbd4edabd0745df2ee5be3e4b0b8b08fa643aa3e4c6702ccc0f00d68fa8a8c9858a735a0032485a44990ed2810526c875e416f001b17df12b"
 }

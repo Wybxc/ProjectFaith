@@ -1,5 +1,11 @@
+import { cardMap } from "./cards";
 import type { Card, Faith } from "./types";
 import typia from "typia";
+import {
+  encode as msgpackEncode,
+  decode as msgpackDecode,
+} from "@msgpack/msgpack";
+import { base64url } from "rfc4648";
 
 /* 计算一张卡牌所需要的信念消耗数量 */
 export function faithCost(card: Card): Record<Faith, number> {
@@ -103,4 +109,71 @@ export function canAfford(faith: Record<Faith, number>, card: Card): boolean {
 
   // 检查是否有足够的信念满足"任意"需求
   return totalAvailable >= cardCost.任意;
+}
+
+/* 序列化卡组 */
+export function serializeDeck(cards: Card[]): string {
+  const counter = new Map<string, number>();
+  for (const card of cards) {
+    const count = counter.get(card.id) || 0;
+    counter.set(card.id, count + 1);
+  }
+
+  /* 序列：[序号, 数量, 序号长度] */
+  const bukkets = new Map<string, [number, number, number][]>();
+  for (const [id, count] of counter) {
+    const [prefix, suffix] = id.match(/(\D+)(\d+)/)?.slice(1) ?? [id, "0"];
+    if (!bukkets.has(prefix)) {
+      bukkets.set(prefix, []);
+    }
+    bukkets.get(prefix)?.push([Number(suffix), count, suffix.length]);
+  }
+
+  /* 压缩序列：如果最后两项与上一项相同，则省略 */
+  const compressedBukkets: Record<string, number[][]> = {};
+  for (const [prefix, counts] of bukkets.entries()) {
+    compressedBukkets[prefix] = [];
+    let last: number[] = [];
+    for (const [suffix, count, len] of counts) {
+      const current = [suffix, count, len];
+      for (let i = current.length - 1; i >= 0; i--) {
+        if (current[i] === last[i]) {
+          current.pop();
+        } else {
+          break;
+        }
+      }
+      compressedBukkets[prefix].push(current);
+      last = [suffix, count, len];
+    }
+  }
+
+  const encoded = msgpackEncode(compressedBukkets);
+  return base64url.stringify(encoded);
+}
+
+/* 反序列化卡组 */
+export function deserializeDeck(serialized: string): Card[] {
+  const encoded = base64url.parse(serialized);
+  const bukkets = typia.assert<Record<string, number[][]>>(
+    msgpackDecode(encoded),
+  );
+
+  const cards: Card[] = [];
+  for (const [prefix, counts] of Object.entries(bukkets)) {
+    let last = [0, 0, 0];
+    for (const current of counts) {
+      const [suffix, count, len] = current.concat(last.slice(current.length));
+      const id = `${prefix}${suffix.toString().padStart(len, "0")}`;
+      const card = cardMap.get(id);
+      if (card) {
+        for (let i = 0; i < count; i++) {
+          cards.push(card);
+        }
+      }
+      last = [suffix, count, len];
+    }
+  }
+
+  return cards;
 }
