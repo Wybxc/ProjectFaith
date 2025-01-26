@@ -11,19 +11,14 @@ export function Card({ children, className, variant = "fit" }: CardProps) {
     <div
       className={cn(
         "card bg-white/10 backdrop-blur-lg",
-        "border border-white/20 rounded-lg md:rounded-xl",
-        "transition-all duration-300",
-        "shadow-lg hover:shadow-xl",
-        "shadow-black/10 hover:shadow-black/20",
-        "hover:bg-white/[0.12]",
+        "border border-white/20 rounded-lg",
+        "shadow-lg shadow-black/10",
         "flex flex-col overflow-hidden",
-        variant === "fill" && "h-full",
+        variant === "fill" && "h-full w-full",
         className,
       )}
     >
-      <div className="card-body !p-3 sm:!p-4 md:!p-5 overflow-hidden">
-        {children}
-      </div>
+      <div className="card-body p-3 overflow-hidden">{children}</div>
     </div>
   );
 }

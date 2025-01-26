@@ -3,7 +3,7 @@ import { AppTitle } from "@/components/ui/AppTitle";
 import { Card } from "@/components/ui/Card";
 import { Background } from "@/components/ui/Background";
 import { Router } from "@/routes";
-import { BiPlus, BiTrash, BiEdit, BiPlay } from "react-icons/bi";
+import { BiPlus, BiTrash, BiEdit, BiPlay, BiArrowBack } from "react-icons/bi";
 
 // 获取所有卡组名称
 const getDeckList = () => {
@@ -47,74 +47,80 @@ export default function Decks() {
   }, []);
 
   return (
-    <Background className="h-screen">
+    <Background>
       <title>卡组管理</title>
-      <Card>
-        <div className="flex flex-col h-full max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <AppTitle title="卡组管理" subtitle="创建、编辑或选择卡组" />
+      <Card variant="fill">
+        <div className="flex flex-col h-full">
+          <div className="flex items-center gap-3 mb-2 sm:mb-4">
             <button
               type="button"
-              onClick={() => Router.push("DeckEditor", { deckName: "" })}
-              className="btn btn-primary gap-2"
+              onClick={() => Router.push("MainMenu")}
+              className="btn btn-ghost btn-sm sm:btn-md p-1 sm:p-3"
             >
-              <BiPlus className="w-5 h-5" />
-              新建卡组
+              <BiArrowBack className="w-5 h-5" />
             </button>
+            <div>
+              <h1 className="text-base sm:text-xl font-bold">卡组管理</h1>
+              <p className="text-xs sm:text-sm text-base-content/70">
+                创建、编辑或选择卡组
+              </p>
+            </div>
           </div>
 
-          <div className="flex-1 overflow-auto glass-panel border border-base-300 rounded-lg p-4">
+          <div className="flex-1 overflow-auto glass-panel border border-base-300 rounded-lg p-1.5 sm:p-4">
             {deckList.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full space-y-4 text-base-content/70">
-                <span className="text-lg">还没有创建任何卡组</span>
+              <div className="flex flex-col items-center justify-center h-full space-y-2 sm:space-y-4 text-base-content/70">
+                <span className="text-sm sm:text-lg">还没有创建任何卡组</span>
                 <button
                   type="button"
-                  onClick={() => Router.push("DeckEditor", { deckName: "" })}
-                  className="btn btn-primary btn-sm gap-2"
+                  onClick={() =>
+                    Router.push("DeckEditor", { deckName: "新卡组" })
+                  }
+                  className="btn btn-primary btn-xs sm:btn-sm gap-1 sm:gap-2"
                 >
-                  <BiPlus className="w-4 h-4" />
+                  <BiPlus className="w-3 h-3 sm:w-4 sm:h-4" />
                   创建第一个卡组
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-max gap-1.5 sm:gap-4 h-full">
                 {deckList.map((deck) => (
                   <div
                     key={deck}
-                    className="card bg-base-100/20 hover:bg-base-100/30 transition-all shadow-lg"
+                    className="card bg-base-100/20 hover:bg-base-100/30 transition-all shadow-lg min-w-[160px] sm:min-w-[240px]"
                   >
-                    <div className="card-body">
-                      <h3 className="card-title text-primary-content">
+                    <div className="card-body p-2 sm:p-4">
+                      <h3 className="card-title text-xs sm:text-base text-primary-content">
                         {deck}
                       </h3>
-                      <div className="card-actions justify-end mt-4">
+                      <div className="card-actions justify-end mt-1.5 sm:mt-4">
                         <button
                           type="button"
                           onClick={() => setDeletingDeck(deck)}
-                          className="btn btn-sm btn-ghost text-error hover:bg-error/20"
+                          className="btn btn-xs sm:btn-sm btn-ghost text-error hover:bg-error/20"
                           title="删除卡组"
                         >
-                          <BiTrash className="w-4 h-4" />
+                          <BiTrash className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleEditDeck(deck)}
-                          className="btn btn-sm btn-ghost"
+                          className="btn btn-xs sm:btn-sm btn-ghost"
                           title="编辑卡组"
                         >
-                          <BiEdit className="w-4 h-4" />
+                          <BiEdit className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handlePlayDeck(deck)}
-                          className="btn btn-sm btn-primary gap-1"
+                          className="btn btn-xs sm:btn-sm btn-primary gap-0.5 sm:gap-1"
                           disabled={isLoading}
                         >
                           {isLoading ? (
                             <span className="loading loading-spinner loading-xs" />
                           ) : (
                             <>
-                              <BiPlay className="w-4 h-4" />
+                              <BiPlay className="w-3 h-3 sm:w-4 sm:h-4" />
                               开始
                             </>
                           )}
@@ -125,16 +131,6 @@ export default function Decks() {
                 ))}
               </div>
             )}
-          </div>
-
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={() => Router.push("MainMenu")}
-              className="btn w-full glass bg-base-100/20 text-base-content"
-            >
-              返回主菜单
-            </button>
           </div>
         </div>
       </Card>

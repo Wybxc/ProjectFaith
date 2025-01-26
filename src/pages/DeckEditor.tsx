@@ -13,6 +13,7 @@ import {
   BiTrash,
   BiX,
   BiCopy, // 添加复制图标
+  BiArrowBack, // 添加返回图标
 } from "react-icons/bi";
 import {
   canAfford,
@@ -275,12 +276,20 @@ export default function DeckEditor({ deckName }: { deckName: string }) {
   return (
     <Background>
       <title>{deckName ? `编辑卡组 - ${deckName}` : "新建卡组"}</title>
-      <CardUI className="flex-1" variant="fill">
+      <CardUI variant="fill">
         <div className="flex h-full gap-3">
           {/* 左侧卡牌列表 */}
           <div className="flex flex-col min-h-0 basis-3/4 lg:basis-2/3 xl:basis-3/4">
             {/* 搜索和筛选区域 */}
             <div className="flex flex-col sm:flex-row gap-2 flex-none">
+              <button
+                type="button"
+                onClick={() => Router.push("Decks")}
+                className="btn-icon btn-circle btn-lg lf-start sm:self-center"
+                title="返回主菜单"
+              >
+                <BiArrowBack className="w-5 h-5" />
+              </button>
               <div className="relative w-full">
                 <BiSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-200/60" />
                 <input

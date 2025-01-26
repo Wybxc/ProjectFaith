@@ -1,19 +1,40 @@
-import { AppTitle } from "@/components/ui/AppTitle";
 import { Card } from "@/components/ui/Card";
 import { Background } from "@/components/ui/Background";
 import { Router } from "@/routes";
+import { cn } from "@/lib/utils";
 
 export default function MainMenu() {
   return (
-    <Background className="flex flex-col items-center justify-center p-2 sm:p-4">
+    <Background>
       <title>信念计划</title>
-      <AppTitle title="信念计划" subtitle="卡牌对战游戏" />
-      <Card className="w-[90%] max-w-[360px] landscape:max-w-[420px] animate-fade-in">
-        <div className="space-y-3">
+      <div className="text-center m-3">
+        <h1
+          className={cn(
+            "text-lg font-bold",
+            "mb-0.5 sm:mb-2 md:mb-3",
+            "text-transparent text-white",
+            "tracking-wide drop-shadow-lg",
+          )}
+        >
+          信念计划
+        </h1>
+        <p
+          className={cn(
+            "text-2xs sm:text-sm md:text-lg",
+            "text-gray-200/90 drop-shadow",
+            "tracking-wide font-medium",
+          )}
+        >
+          卡牌对战游戏
+        </p>
+        )
+      </div>
+      <Card>
+        <div className="flex flex-col gap-3">
           <button
             type="button"
             onClick={() => Router.push("Decks")}
-            className="btn btn-primary bg-primary/90 backdrop-blur text-primary-content shadow-lg shadow-primary/20 border-primary/50 hover:bg-primary hover:border-primary hover:shadow-primary/40 w-full text-lg font-medium"
+            className="btn btn-primary bg-primary/90 backdrop-blur text-primary-content shadow-lg shadow-primary/20 border-primary/50 hover:bg-primary hover:border-primary hover:shadow-primary/40 w-full"
           >
             开始游戏
           </button>
