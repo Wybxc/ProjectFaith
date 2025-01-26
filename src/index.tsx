@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import Background from "./components/layout/Background";
-import ScreenRotationGuard from "./components/ui/ScreenRotationGuard";
+import ScreenRotationGuard from "./components/layout/ScreenRotationGuard";
 import "./index.css";
 import DeckEditor from "./pages/DeckEditor";
 import Decks from "./pages/Decks";

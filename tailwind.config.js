@@ -1,5 +1,6 @@
 import daisyui from "daisyui";
 import tailwindScrollbar from "tailwind-scrollbar";
+import containerQueries from "@tailwindcss/container-queries";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -7,7 +8,7 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [daisyui, tailwindScrollbar],
+  plugins: [daisyui, tailwindScrollbar, containerQueries],
   daisyui: {
     themes: ["cupcake"],
   },
