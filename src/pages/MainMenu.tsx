@@ -1,11 +1,11 @@
 import { Card } from "@/components/ui/Card";
-import { Background } from "@/components/ui/Background";
-import { Router } from "@/routes";
+import { root } from "@/routes";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router";
 
 export default function MainMenu() {
   return (
-    <Background>
+    <>
       <title>信念计划</title>
       <div className="text-center m-3">
         <h1
@@ -31,13 +31,12 @@ export default function MainMenu() {
       </div>
       <Card>
         <div className="flex flex-col gap-3">
-          <button
-            type="button"
-            onClick={() => Router.push("Decks")}
+          <Link
+            to={root.deck.$buildPath({})}
             className="btn btn-primary bg-primary/90 backdrop-blur text-primary-content shadow-lg shadow-primary/20 border-primary/50 hover:bg-primary hover:border-primary hover:shadow-primary/40 w-full"
           >
             开始游戏
-          </button>
+          </Link>
           <button
             type="button"
             className="btn glass bg-base-100/20 text-base-content border-base-content/20 hover:bg-base-100/30 hover:border-base-content/30 hover:text-base-content/90 w-full"
@@ -52,6 +51,6 @@ export default function MainMenu() {
           </button>
         </div>
       </Card>
-    </Background>
+    </>
   );
 }

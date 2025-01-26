@@ -1,8 +1,8 @@
-import type { PropsWithChildren } from "react";
 import { HiDevicePhoneMobile } from "react-icons/hi2";
+import { Outlet } from "react-router";
 import { useOrientation } from "react-use";
 
-export default function ScreenRotationGuard({ children }: PropsWithChildren) {
+export default function ScreenRotationGuard() {
   const orientation = useOrientation();
   const isPortrait = orientation.type.includes("portrait");
 
@@ -21,7 +21,7 @@ export default function ScreenRotationGuard({ children }: PropsWithChildren) {
           <p className="text-xl m-0">请将设备横向放置以获得最佳体验</p>
         </div>
       </div>
-      {children}
+      <Outlet />
     </>
   );
 }

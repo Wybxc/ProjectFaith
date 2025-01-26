@@ -1,8 +1,18 @@
-import { createRouter } from "@swan-io/chicane";
+import { route } from "react-router-typesafe-routes";
 
-export const Router = createRouter({
-  MainMenu: "/",
-  Decks: "/deck",
-  DeckEditor: "/deck/edit/:deckName",
-  Game: "/game/:room",
+export const root = route({
+  path: "",
+  children: {
+    deck: route({
+      path: "deck",
+      children: {
+        edit: route({
+          path: "edit/:deckName",
+        }),
+      },
+    }),
+    game: route({
+      path: "game/:room",
+    }),
+  },
 });
