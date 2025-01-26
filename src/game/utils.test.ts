@@ -11,7 +11,6 @@ import {
 } from "./utils";
 import type { Card } from "./types";
 import { cardMap, cards } from "./cards";
-import { a } from "vitest/dist/chunks/suite.BJU7kdY9.js";
 
 describe("utils", () => {
   describe("faithCost", () => {
