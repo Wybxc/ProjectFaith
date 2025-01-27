@@ -1,25 +1,21 @@
-import { useState, useMemo, useCallback } from "react";
-import { root } from "@/routes";
+import { useState, useCallback, useEffect } from "react";
+
+import { useDeckStore } from "@/store/deck";
 import { BiPlus, BiTrash, BiEdit, BiPlay, BiArrowBack } from "react-icons/bi";
 import { useNavigate } from "react-router";
-
-// 获取所有卡组名称
-const getDeckList = () => {
-  const decks: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key?.startsWith("deck:")) {
-      decks.push(key.slice(5));
-    }
-  }
-  return decks;
-};
+import { root } from "@/routes";
 
 export default function Decks() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [deletingDeck, setDeletingDeck] = useState<string | null>(null);
-  const deckList = useMemo(() => getDeckList(), []);
+
+  const { deckNames, loadDecks, deleteDeck } = useDeckStore();
+
+  // 加载卡组列表
+  useEffect(() => {
+    loadDecks();
+  }, [loadDecks]);
 
   const handlePlayDeck = useCallback(
     (deckName: string) => {
@@ -47,11 +43,11 @@ export default function Decks() {
   const handleDeleteDeck = useCallback(
     (deckName: string) => {
       if (!deckName) return;
-      localStorage.removeItem(`deck:${deckName}`);
+      deleteDeck(deckName);
       setDeletingDeck(null);
       navigate(root.deck.$buildPath({}));
     },
-    [navigate],
+    [navigate, deleteDeck],
   );
 
   return (
@@ -76,7 +72,7 @@ export default function Decks() {
         </div>
 
         <div className="flex-1 overflow-auto glass-panel border border-base-300 rounded-lg p-1.5 sm:p-4">
-          {deckList.length === 0 ? (
+          {deckNames.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full space-y-2 sm:space-y-4 text-base-content/70">
               <span className="text-sm sm:text-lg">还没有创建任何卡组</span>
               <button
@@ -96,7 +92,7 @@ export default function Decks() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-max gap-1.5 sm:gap-4 h-full">
-              {deckList.map((deck) => (
+              {deckNames.map((deck) => (
                 <div
                   key={deck}
                   className="card bg-base-100/20 hover:bg-base-100/30 transition-all shadow-lg min-w-[160px] sm:min-w-[240px]"
