@@ -10,15 +10,13 @@ export function Card({ children, className, variant = "fit" }: CardProps) {
   return (
     <div
       className={cn(
-        "card bg-white/10 backdrop-blur-lg",
-        "border border-white/20 rounded-lg",
-        "shadow-lg shadow-black/10",
-        "flex flex-col overflow-hidden",
+        `card flex flex-col overflow-hidden rounded-lg border border-white/20 bg-white/10
+        shadow-lg shadow-black/10 backdrop-blur-lg`,
         variant === "fill" && "h-full w-full",
         className,
       )}
     >
-      <div className="card-body p-3 overflow-hidden">{children}</div>
+      <div className="card-body overflow-hidden p-3">{children}</div>
     </div>
   );
 }

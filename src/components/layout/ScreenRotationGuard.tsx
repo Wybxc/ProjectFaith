@@ -1,6 +1,7 @@
 import { HiDevicePhoneMobile } from "react-icons/hi2";
 import { Outlet } from "react-router";
 import { useOrientation } from "react-use";
+import { cn } from "@/lib/utils";
 
 export default function ScreenRotationGuard() {
   const orientation = useOrientation();
@@ -9,16 +10,17 @@ export default function ScreenRotationGuard() {
   return (
     <>
       <div
-        className={`
-          fixed top-0 left-0 w-full h-full bg-black
-          flex justify-center items-center z-50
-          transition-all duration-300 ease-in-out
-          ${isPortrait ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"}
-        `}
+        className={cn(
+          `fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black
+          transition-all duration-300 ease-in-out`,
+          isPortrait
+            ? "pointer-events-auto visible opacity-100"
+            : "pointer-events-none invisible opacity-0",
+        )}
       >
         <div className="text-center text-white">
-          <HiDevicePhoneMobile className="w-12 h-12 rotate-90 mb-4 mx-auto" />
-          <p className="text-xl m-0">请将设备横向放置以获得最佳体验</p>
+          <HiDevicePhoneMobile className="mx-auto mb-4 h-12 w-12 rotate-90" />
+          <p className="m-0 text-xl">请将设备横向放置以获得最佳体验</p>
         </div>
       </div>
       <Outlet />

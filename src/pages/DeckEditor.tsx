@@ -29,7 +29,7 @@ import { CardScrollbar } from "@/components/ui/Scrollbar";
 import { GlassPanel, CardHover } from "@/components/ui/Panel";
 import { Input, InputSmall, Select } from "@/components/ui/Input";
 import { GameButton, IconButton } from "@/components/ui/Button";
-import { LandscapeStyles } from "@/components/ui/MediaQuery";
+import { cn } from "@/lib/utils";
 
 // 简化常量定义
 const CONSTANTS = {
@@ -217,21 +217,22 @@ export default function DeckEditor() {
     ));
 
   return (
-    <LandscapeStyles>
+    <>
       <title>{deckName ? `编辑卡组 - ${deckName}` : "新建卡组"}</title>
 
       <div className="flex h-full gap-3">
-        <div className="flex flex-col min-h-0 basis-3/4 lg:basis-2/3 xl:basis-3/4">
-          <div className="flex flex-col sm:flex-row gap-2 flex-none">
+        {/* 左侧卡牌列表 */}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex flex-none flex-col gap-2 sm:flex-row">
             <IconButton
               onClick={() => navigate(-1)}
-              className="btn-circle lf-start sm:self-center landscape:btn-sm"
+              className="lf-start btn-circle btn-sm sm:self-center"
               title="返回"
             >
-              <BiArrowBack className="w-5 h-5 landscape:w-4 landscape:h-4" />
+              <BiArrowBack className="h-4 w-4 landscape:h-5 landscape:w-5" />
             </IconButton>
             <div className="relative w-full">
-              <BiSearch className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-200/60" />
+              <BiSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-200/60" />
               <Input
                 type="text"
                 placeholder="输入卡牌名称搜索..."
@@ -243,7 +244,7 @@ export default function DeckEditor() {
               />
             </div>
             <div className="relative w-full sm:w-auto">
-              <BiFilter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-200/60" />
+              <BiFilter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-200/60" />
               <Select
                 className="w-full pl-9"
                 value={state.filter}
@@ -262,8 +263,8 @@ export default function DeckEditor() {
             </div>
           </div>
 
-          <CardScrollbar className="flex-1 overflow-auto mt-2 min-h-0">
-            <div className="grid auto-rows-max grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 landscape:grid-cols-3 gap-2 p-2">
+          <CardScrollbar className="mt-2 min-h-0 flex-1 overflow-auto">
+            <div className="grid auto-rows-max grid-cols-3 gap-2 p-2 sm:grid-cols-2 xl:grid-cols-3">
               {filteredCards.map((card) => {
                 const hasFaith = deckStats.availableCards.includes(card.id);
                 const isUnavailable = !cardOps.isAvailable(card);
@@ -272,9 +273,10 @@ export default function DeckEditor() {
                   <CardHover
                     key={card.id}
                     as="button"
-                    className={`p-3 landscape:p-2 ${
-                      !isAvailable && "opacity-50 cursor-not-allowed"
-                    }`}
+                    className={cn(
+                      "p-2 landscape:p-3",
+                      !isAvailable && "cursor-not-allowed opacity-50",
+                    )}
                     onClick={() => isAvailable && cardOps.add(card)}
                     disabled={!isAvailable}
                     title={
@@ -285,18 +287,18 @@ export default function DeckEditor() {
                           : undefined
                     }
                   >
-                    <div className="flex justify-between items-start">
-                      <Title className="landscape:text-sm">{card.name}</Title>
+                    <div className="flex items-start justify-between">
+                      <Title className="text-sm">{card.name}</Title>
                       {"cost" in card.subtype && (
                         <div className="flex flex-wrap justify-end">
                           {getFaithCost(card.subtype.cost)}
                         </div>
                       )}
                     </div>
-                    <Subtitle className="text-sm mt-2 landscape:text-xs landscape:mt-1">
+                    <Subtitle className="mt-2 text-xs">
                       {card.description}
                     </Subtitle>
-                    <div className="text-xs text-slate-200 opacity-75 mt-1 landscape:text-[10px]">
+                    <div className="mt-1 text-[10px] text-xs text-slate-200 opacity-75">
                       {card.subtype.type}
                       {"rarity" in card.subtype && ` - ★${card.subtype.rarity}`}
                     </div>
@@ -307,11 +309,12 @@ export default function DeckEditor() {
           </CardScrollbar>
         </div>
 
-        <div className="flex flex-col min-h-0 basis-1/4 lg:basis-1/3 xl:basis-1/4">
-          <div className="flex flex-col gap-2 mb-3 flex-none landscape:gap-1">
-            <div className="flex justify-between items-center">
+        {/* 右侧卡组编辑 */}
+        <div className="flex min-h-0 w-1/3 flex-col">
+          <div className="mb-3 flex flex-none flex-col gap-2">
+            <div className="flex items-center justify-between">
               {state.isEditingName ? (
-                <div className="flex gap-3 items-center flex-1">
+                <div className="flex flex-1 items-center gap-3">
                   <InputSmall
                     type="text"
                     value={state.editedName}
@@ -327,7 +330,7 @@ export default function DeckEditor() {
                     onClick={() => deckOps.rename(state.editedName)}
                     className="btn-sm gap-2"
                   >
-                    <BiSave className="w-4 h-4" />
+                    <BiSave className="h-4 w-4" />
                     确定
                   </GameButton>
                 </div>
@@ -340,7 +343,7 @@ export default function DeckEditor() {
                     }
                     title="编辑卡组名称"
                   >
-                    <BiEdit className="w-4 h-4" />
+                    <BiEdit className="h-4 w-4" />
                   </IconButton>
                 </div>
               )}
@@ -353,15 +356,13 @@ export default function DeckEditor() {
                   title={state.copySuccess ? "已复制卡组代码" : "复制卡组代码"}
                   className={state.copySuccess ? "text-success" : ""}
                 >
-                  <BiCopy className="w-4 h-4" />
+                  <BiCopy className="h-4 w-4" />
                 </IconButton>
               </div>
             </div>
 
-            <GlassPanel className="flex items-center justify-between gap-2 p-2 landscape:p-1.5">
-              <span className="text-sm text-slate-200 landscape:text-xs">
-                信念组成：
-              </span>
+            <GlassPanel className="flex items-center justify-between gap-2 p-2">
+              <span className="text-xs text-slate-200">信念组成：</span>
               <div className="flex gap-1">
                 {(Object.entries(deckStats.faithCost) as [Faith, number][]).map(
                   ([faith, cost]) =>
@@ -381,20 +382,20 @@ export default function DeckEditor() {
             </GlassPanel>
           </div>
 
-          <CardScrollbar className="flex-1 overflow-auto min-h-0 mb-3 landscape:mb-2">
+          <CardScrollbar className="mb-2 min-h-0 flex-1 overflow-auto landscape:mb-3">
             <GlassPanel className="h-full">
               <div className="space-y-1 p-2">
                 {groupedSelectedCards.map(({ card, count }) => (
                   <CardHover
                     key={card.id}
-                    className="flex justify-between items-center p-2 text-sm"
+                    className="flex items-center justify-between p-2 text-sm"
                   >
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
                       <div className="truncate">
                         <span className="font-medium text-slate-100">
                           {card.name}{" "}
                           {count > 1 && (
-                            <span className="text-slate-100 font-bold">
+                            <span className="font-bold text-slate-100">
                               x{count}
                             </span>
                           )}
@@ -406,20 +407,26 @@ export default function DeckEditor() {
                         </div>
                       )}
                     </div>
-                    <div className="flex gap-2 flex-none ml-2">
+                    <div className="ml-2 flex flex-none gap-2">
                       <IconButton
                         onClick={() => cardOps.remove(card.id)}
                         title="移除一张"
-                        className="text-error hover:bg-error hover:text-error-content transition-colors"
+                        className={cn(
+                          "text-error transition-colors",
+                          "hover:bg-error hover:text-error-content",
+                        )}
                       >
-                        <BiMinus className="w-4 h-4" />
+                        <BiMinus className="h-4 w-4" />
                       </IconButton>
                       <IconButton
                         onClick={() => cardOps.remove(card.id, true)}
                         title="移除全部"
-                        className="text-error hover:bg-error hover:text-error-content transition-colors"
+                        className={cn(
+                          "text-error transition-colors",
+                          "hover:bg-error hover:text-error-content",
+                        )}
                       >
-                        <BiTrash className="w-4 h-4" />
+                        <BiTrash className="h-4 w-4" />
                       </IconButton>
                     </div>
                   </CardHover>
@@ -429,17 +436,23 @@ export default function DeckEditor() {
           </CardScrollbar>
 
           {state.errors.length > 0 && (
-            <div className="mb-3 p-3 landscape:p-2 landscape:mb-2 bg-error/10 border border-error/20 rounded-lg">
-              <div className="text-error font-medium mb-2 landscape:text-sm">
+            <div
+              className={cn(
+                "mb-2 rounded-lg landscape:mb-3",
+                "border border-error/20 bg-error/10",
+                "p-2 landscape:p-3",
+              )}
+            >
+              <div className="mb-2 text-sm font-medium text-error">
                 卡组存在以下问题：
               </div>
-              <ul className="text-sm space-y-1 landscape:text-xs">
+              <ul className="space-y-1 text-xs landscape:text-sm">
                 {state.errors.map((error) => (
                   <li
                     key={error}
                     className="flex items-center gap-2 text-error/90"
                   >
-                    <BiX className="flex-none w-4 h-4" />
+                    <BiX className="h-4 w-4 flex-none" />
                     {error}
                   </li>
                 ))}
@@ -450,22 +463,18 @@ export default function DeckEditor() {
           <GameButton
             onClick={deckOps.save}
             disabled={state.errors.length > 0}
-            className={
-              state.errors.length > 0
-                ? "btn-disabled landscape:text-sm"
-                : "landscape:text-sm"
-            }
+            className={cn("text-sm", state.errors.length > 0 && "btn-disabled")}
           >
-            <BiSave className="w-5 h-5 landscape:w-4 landscape:h-4" />
+            <BiSave className="h-4 w-4 landscape:h-5 landscape:w-5" />
             保存卡组
             {state.errors.length > 0 && (
-              <span className="text-sm landscape:text-xs">
+              <span className="text-xs landscape:text-sm">
                 （请先修正错误）
               </span>
             )}
           </GameButton>
         </div>
       </div>
-    </LandscapeStyles>
+    </>
   );
 }

@@ -1,17 +1,12 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-const baseButtonStyles = "shadow-lg transition-colors duration-200";
-
 export function GameButton({ className, ...props }: ComponentProps<"button">) {
   return (
     <button
       className={cn(
-        "btn btn-primary w-full text-base",
-        baseButtonStyles,
-        "hover:brightness-110 shadow-primary/20 hover:shadow-primary/30",
-        "h-12 min-h-0",
-        "landscape:h-8 landscape:text-sm",
+        `btn btn-primary h-8 min-h-0 w-full text-sm shadow-lg shadow-primary/20
+        transition-colors duration-200 hover:shadow-primary/30 hover:brightness-110`,
         className,
       )}
       {...props}
@@ -23,8 +18,7 @@ export function IconButton({ className, ...props }: ComponentProps<"button">) {
   return (
     <button
       className={cn(
-        "btn btn-ghost text-white/80 hover:text-white",
-        "landscape:btn-sm",
+        "btn btn-ghost btn-sm text-white/80 hover:text-white",
         className,
       )}
       {...props}

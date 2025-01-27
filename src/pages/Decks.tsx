@@ -54,26 +54,29 @@ export default function Decks() {
     <>
       <title>卡组管理</title>
 
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-3 mb-2 sm:mb-4">
+      <div className="flex h-full flex-col">
+        <div className="mb-2 flex items-center gap-3 sm:mb-4">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="btn btn-ghost btn-sm sm:btn-md p-1 sm:p-3"
+            className="btn btn-ghost btn-sm p-1 sm:btn-md sm:p-3"
           >
-            <BiArrowBack className="w-5 h-5" />
+            <BiArrowBack className="h-5 w-5" />
           </button>
           <div>
-            <h1 className="text-base sm:text-xl font-bold">卡组管理</h1>
-            <p className="text-xs sm:text-sm text-base-content/70">
+            <h1 className="text-base font-bold sm:text-xl">卡组管理</h1>
+            <p className="text-xs text-base-content/70 sm:text-sm">
               创建、编辑或选择卡组
             </p>
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto glass-panel border border-base-300 rounded-lg p-1.5 sm:p-4">
+        <div className="glass-panel flex-1 overflow-auto rounded-lg border border-base-300 p-1.5 sm:p-4">
           {deckNames.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-2 sm:space-y-4 text-base-content/70">
+            <div
+              className="flex h-full flex-col items-center justify-center space-y-2 text-base-content/70
+                sm:space-y-4"
+            >
               <span className="text-sm sm:text-lg">还没有创建任何卡组</span>
               <button
                 type="button"
@@ -84,51 +87,55 @@ export default function Decks() {
                     }),
                   )
                 }
-                className="btn btn-primary btn-xs sm:btn-sm gap-1 sm:gap-2"
+                className="btn btn-primary btn-xs gap-1 sm:btn-sm sm:gap-2"
               >
-                <BiPlus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <BiPlus className="h-3 w-3 sm:h-4 sm:w-4" />
                 创建第一个卡组
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-max gap-1.5 sm:gap-4 h-full">
+            <div
+              className="grid h-full auto-rows-max grid-cols-1 gap-1.5 sm:grid-cols-2 sm:gap-4
+                md:grid-cols-3 lg:grid-cols-4"
+            >
               {deckNames.map((deck) => (
                 <div
                   key={deck}
-                  className="card bg-base-100/20 hover:bg-base-100/30 transition-all shadow-lg min-w-[160px] sm:min-w-[240px]"
+                  className="card min-w-[160px] bg-base-100/20 shadow-lg transition-all hover:bg-base-100/30
+                    sm:min-w-[240px]"
                 >
                   <div className="card-body p-2 sm:p-4">
-                    <h3 className="card-title text-xs sm:text-base text-primary-content">
+                    <h3 className="card-title text-xs text-primary-content sm:text-base">
                       {deck}
                     </h3>
-                    <div className="card-actions justify-end mt-1.5 sm:mt-4">
+                    <div className="card-actions mt-1.5 justify-end sm:mt-4">
                       <button
                         type="button"
                         onClick={() => setDeletingDeck(deck)}
-                        className="btn btn-xs sm:btn-sm btn-ghost text-error hover:bg-error/20"
+                        className="btn btn-ghost btn-xs text-error sm:btn-sm hover:bg-error/20"
                         title="删除卡组"
                       >
-                        <BiTrash className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <BiTrash className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleEditDeck(deck)}
-                        className="btn btn-xs sm:btn-sm btn-ghost"
+                        className="btn btn-ghost btn-xs sm:btn-sm"
                         title="编辑卡组"
                       >
-                        <BiEdit className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <BiEdit className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                       <button
                         type="button"
                         onClick={() => handlePlayDeck(deck)}
-                        className="btn btn-xs sm:btn-sm btn-primary gap-0.5 sm:gap-1"
+                        className="btn btn-primary btn-xs gap-0.5 sm:btn-sm sm:gap-1"
                         disabled={isLoading}
                       >
                         {isLoading ? (
                           <span className="loading loading-spinner loading-xs" />
                         ) : (
                           <>
-                            <BiPlay className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <BiPlay className="h-3 w-3 sm:h-4 sm:w-4" />
                             开始
                           </>
                         )}
@@ -145,7 +152,7 @@ export default function Decks() {
       {deletingDeck && (
         <div className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg">删除卡组</h3>
+            <h3 className="text-lg font-bold">删除卡组</h3>
             <p className="py-4">
               确定要删除卡组 "{deletingDeck}" 吗？此操作无法撤销。
             </p>

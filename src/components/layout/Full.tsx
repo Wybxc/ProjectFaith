@@ -1,18 +1,12 @@
-import { cn } from "@/lib/utils";
 import { Outlet } from "react-router";
 
 export default function Full() {
   return (
     <div
-      className={cn(
-        "card bg-white/10 backdrop-blur-lg",
-        "border border-white/20 rounded-lg",
-        "shadow-lg shadow-black/10",
-        "flex flex-col overflow-hidden",
-        "h-full w-full",
-      )}
+      className="card flex h-full w-full flex-col overflow-hidden rounded-lg border
+        border-white/20 bg-white/10 shadow-lg shadow-black/10 backdrop-blur-lg"
     >
-      <div className="card-body p-3 overflow-hidden">
+      <div className="card-body overflow-hidden p-3">
         <Outlet />
       </div>
     </div>
